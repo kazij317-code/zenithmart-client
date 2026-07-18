@@ -6,7 +6,7 @@ import Footer from "@/components/Footer";
 import AIChatBot from "@/components/AIChatBot";
 import { useApp } from "@/context/AppContext";
 import { useAuth } from "@/context/AuthContext";
-import { ShoppingCart, Heart, Package, Trash2, MapPin, CreditCard, CheckCircle } from "lucide-react";
+import { ShoppingCart, Heart, Package, Trash2, MapPin, CreditCard, CheckCircle, User, LogOut, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 interface OrderItem {
@@ -30,7 +30,7 @@ interface Order {
 function UserDashboardContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const { cart, favorites, addToCart, removeFromCart, clearCart, toggleFavorite, checkout } = useApp();
 
   const [activeTab, setActiveTab] = useState("cart");
@@ -39,6 +39,43 @@ function UserDashboardContent() {
   const [orderHistory, setOrderHistory] = useState<Order[]>([]);
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [checkingOut, setCheckingOut] = useState(false);
+
+  // Update Profile states
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [updateName, setUpdateName] = useState("");
+  const [updateImage, setUpdateImage] = useState("");
+  const [updating, setUpdating] = useState(false);
+  const { updateProfile } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      setUpdateName(user.name || "");
+      setUpdateImage(user.image || "");
+    }
+  }, [user]);
+
+  const handleUpdateProfileSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!updateName.trim()) {
+      alert("Full name is required.");
+      return;
+    }
+    setUpdating(true);
+    try {
+      const res = await updateProfile(updateName, updateImage || undefined);
+      if (res.success) {
+        setIsUpdateModalOpen(false);
+        alert("Profile updated successfully!");
+      } else {
+        alert(res.error || "Failed to update profile.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("An error occurred while updating profile.");
+    } finally {
+      setUpdating(false);
+    }
+  };
 
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:5000";
 
@@ -125,7 +162,7 @@ function UserDashboardContent() {
 
             <button
               onClick={() => setActiveTab("cart")}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold transition-colors ${
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
                 activeTab === "cart"
                   ? "bg-brand text-white shadow-md shadow-brand/20"
                   : "hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-600 dark:text-gray-300"
@@ -136,7 +173,7 @@ function UserDashboardContent() {
 
             <button
               onClick={() => setActiveTab("favorites")}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold transition-colors ${
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
                 activeTab === "favorites"
                   ? "bg-brand text-white shadow-md shadow-brand/20"
                   : "hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-600 dark:text-gray-300"
@@ -147,7 +184,7 @@ function UserDashboardContent() {
 
             <button
               onClick={() => setActiveTab("orders")}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold transition-colors ${
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
                 activeTab === "orders"
                   ? "bg-brand text-white shadow-md shadow-brand/20"
                   : "hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-600 dark:text-gray-300"
@@ -155,6 +192,26 @@ function UserDashboardContent() {
             >
               <Package size={16} /> Order History
             </button>
+
+            <button
+              onClick={() => setActiveTab("profile")}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
+                activeTab === "profile"
+                  ? "bg-brand text-white shadow-md shadow-brand/20"
+                  : "hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-600 dark:text-gray-300"
+              }`}
+            >
+              <User size={16} /> My Profile
+            </button>
+
+            <div className="pt-4 border-t border-card-border mt-4">
+              <button
+                onClick={logout}
+                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
+              >
+                <LogOut size={16} /> Sign Out
+              </button>
+            </div>
           </div>
 
           {/* Content Area */}
@@ -365,6 +422,110 @@ function UserDashboardContent() {
                         </div>
                       </div>
                     ))}
+                  </div>
+                )}
+              </div>
+            )}
+            {/* PROFILE TAB */}
+            {activeTab === "profile" && (
+              <div className="space-y-6">
+                <h2 className="text-xl font-bold pb-4 border-b border-card-border">My Profile</h2>
+                <div className="flex flex-col md:flex-row gap-8 items-center md:items-start p-6 rounded-2xl bg-gray-50 dark:bg-slate-900/30 border border-card-border">
+                  <div className="w-24 h-24 rounded-full bg-brand/20 dark:bg-gold/20 flex items-center justify-center text-brand dark:text-gold font-bold text-3xl flex-shrink-0">
+                    {user.image ? <img src={user.image} alt={user.name} className="w-24 h-24 rounded-full object-cover" /> : user.name[0]}
+                  </div>
+                  <div className="flex-grow space-y-4 text-xs">
+                    <div>
+                      <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">Full Name</span>
+                      <span className="text-sm font-bold text-gray-800 dark:text-white mt-1 block">{user.name}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">Email Address</span>
+                      <span className="text-sm font-bold text-gray-800 dark:text-white mt-1 block">{user.email}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">Account Role</span>
+                      <span className="inline-block mt-1 bg-brand/10 text-brand px-2 py-0.5 rounded text-[10px] font-bold uppercase">{user.role}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider block">User ID</span>
+                      <span className="font-mono text-gray-500 mt-1 block">{user.id}</span>
+                    </div>
+                    <div className="pt-2">
+                      <button
+                        onClick={() => setIsUpdateModalOpen(true)}
+                        className="px-5 py-2.5 bg-gradient-to-r from-cyan-500 via-indigo-500 to-purple-600 text-white rounded-xl text-xs font-bold hover:opacity-90 transition-all cursor-pointer shadow-md"
+                      >
+                        Update Profile
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* UPDATE USER MODAL */}
+                {isUpdateModalOpen && (
+                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+                    <div className="relative w-full max-w-sm bg-white dark:bg-[#090d16] border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-2xl animate-in fade-in zoom-in-95 text-slate-800 dark:text-white">
+                      <button
+                        onClick={() => setIsUpdateModalOpen(false)}
+                        className="absolute right-5 top-5 text-slate-400 hover:text-slate-700 dark:text-slate-500 dark:hover:text-white cursor-pointer"
+                      >
+                        <X size={18} />
+                      </button>
+
+                      <div className="flex flex-col items-center mb-6">
+                        <div className="w-14 h-14 rounded-full border border-cyan-500/30 flex items-center justify-center text-cyan-500 dark:text-cyan-400 mb-4 bg-cyan-500/5 dark:bg-cyan-950/20">
+                          <User size={24} />
+                        </div>
+                        <h3 className="text-lg font-bold text-slate-800 dark:text-white text-center">Update User</h3>
+                      </div>
+
+                      <form onSubmit={handleUpdateProfileSubmit} className="space-y-5">
+                        <div>
+                          <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
+                            FULL NAME
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            value={updateName}
+                            onChange={(e) => setUpdateName(e.target.value)}
+                            placeholder="Enter your name"
+                            className="w-full bg-slate-50 dark:bg-[#1e293b]/70 border border-slate-300 dark:border-slate-700/60 focus:border-cyan-500 text-slate-800 dark:text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-cyan-500 transition-all placeholder-slate-400 dark:placeholder-slate-500"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
+                            AVATAR IMAGE URL
+                          </label>
+                          <input
+                            type="url"
+                            value={updateImage}
+                            onChange={(e) => setUpdateImage(e.target.value)}
+                            placeholder="Enter avatar URL"
+                            className="w-full bg-slate-50 dark:bg-[#1e293b]/70 border border-slate-300 dark:border-slate-700/60 focus:border-cyan-500 text-slate-800 dark:text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-cyan-500 transition-all placeholder-slate-400 dark:placeholder-slate-500"
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3 pt-2">
+                          <button
+                            type="button"
+                            onClick={() => setIsUpdateModalOpen(false)}
+                            className="py-3 bg-slate-100 dark:bg-[#1e293b] hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-600 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white rounded-xl text-xs font-bold transition-all border border-slate-300 dark:border-slate-700/60 cursor-pointer"
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            type="submit"
+                            disabled={updating}
+                            className="py-3 bg-gradient-to-r from-cyan-500 via-indigo-500 to-purple-600 hover:opacity-95 text-white rounded-xl text-xs font-bold transition-all cursor-pointer shadow-lg shadow-indigo-500/20"
+                          >
+                            {updating ? "Saving..." : "Save Changes"}
+                          </button>
+                        </div>
+                      </form>
+                    </div>
                   </div>
                 )}
               </div>

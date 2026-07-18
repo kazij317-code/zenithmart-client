@@ -17,6 +17,7 @@ interface AuthContextType {
   loading: boolean;
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   register: (name: string, email: string, password: string, image?: string, role?: string) => Promise<{ success: boolean; error?: string }>;
+  updateProfile: (name: string, image?: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
 }
 
@@ -154,6 +155,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const updateProfile = async (name: string, image?: string) => {
+    try {
+      const { data, error } = await authClient.updateUser({
+        name,
+        image
+      });
+
+      if (error) {
+        return { success: false, error: error.message || 'Profile update failed' };
+      }
+
+      if (data && data.status) {
+        setUser((prev) => {
+          if (!prev) return null;
+          const updated = {
+            ...prev,
+            name: name,
+            image: image || undefined
+          };
+          localStorage.setItem('zenithmart_user', JSON.stringify(updated));
+          return updated;
+        });
+        return { success: true };
+      }
+      return { success: false, error: 'Profile update failed' };
+    } catch (err: any) {
+      return { success: false, error: err.message || 'Network error, please try again.' };
+    }
+  };
+
   const logout = async () => {
     try {
       await authClient.signOut();
@@ -167,7 +198,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, updateProfile, logout }}>
       {children}
     </AuthContext.Provider>
   );

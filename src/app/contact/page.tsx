@@ -5,20 +5,32 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AIChatBot from "@/components/AIChatBot";
 import { Mail, Phone, MapPin, Send, MessageSquare } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { useEffect } from "react";
 
 export default function Contact() {
+  const { user } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      setName(user.name || "");
+      setEmail(user.email || "");
+    }
+  }, [user]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setSending(true);
     setTimeout(() => {
       alert("Your message has been sent successfully. We'll get back to you soon!");
-      setName("");
-      setEmail("");
+      if (!user) {
+        setName("");
+        setEmail("");
+      }
       setMessage("");
       setSending(false);
     }, 1500);

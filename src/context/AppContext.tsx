@@ -74,17 +74,27 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
 
       try {
         // Fetch cart
-        const cartRes = await fetch(`${BASE_URL}/api/cart`, { headers });
-        const cartData = await cartRes.json();
-        if (cartData.success) {
-          setCart(cartData.items || []);
+        const cartRes = await fetch(`${BASE_URL}/api/cart?email=${encodeURIComponent(user.email)}`, { headers });
+        const cartContentType = cartRes.headers.get("content-type");
+        if (cartContentType && cartContentType.includes("application/json")) {
+          const cartData = await cartRes.json();
+          if (cartData.success) {
+            setCart(cartData.cart || cartData.items || []);
+          }
+        } else {
+          console.error("Cart response was not JSON:", await cartRes.text());
         }
 
         // Fetch favorites
-        const favsRes = await fetch(`${BASE_URL}/api/favorites`, { headers });
-        const favsData = await favsRes.json();
-        if (favsData.success) {
-          setFavorites(favsData.favorites || []);
+        const favsRes = await fetch(`${BASE_URL}/api/favorites?email=${encodeURIComponent(user.email)}`, { headers });
+        const favsContentType = favsRes.headers.get("content-type");
+        if (favsContentType && favsContentType.includes("application/json")) {
+          const favsData = await favsRes.json();
+          if (favsData.success) {
+            setFavorites(favsData.favorites || []);
+          }
+        } else {
+          console.error("Favorites response was not JSON:", await favsRes.text());
         }
       } catch (err) {
         console.error("Error fetching cart/favs:", err);
@@ -112,7 +122,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${sessionToken}`
         },
-        body: JSON.stringify({ productId, quantity: qty })
+        body: JSON.stringify({ email: user.email, productId, quantity: qty })
       });
       const data = await response.json();
       if (data.success) {
@@ -146,7 +156,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     if (!user) return;
     const sessionToken = localStorage.getItem("better-auth.session_token") || "";
     try {
-      await fetch(`${BASE_URL}/api/cart`, {
+      await fetch(`${BASE_URL}/api/cart?email=${encodeURIComponent(user.email)}`, {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${sessionToken}`
@@ -171,7 +181,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${sessionToken}`
         },
-        body: JSON.stringify({ productId })
+        body: JSON.stringify({ email: user.email, productId })
       });
       const data = await response.json();
       if (data.success) {
