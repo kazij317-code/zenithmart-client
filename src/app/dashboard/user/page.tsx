@@ -114,22 +114,27 @@ function UserDashboardContent() {
   const handleCheckoutSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!shippingAddress.trim()) {
-      alert("Please provide a shipping address.");
+      toast.error("Please provide a shipping address.");
       return;
     }
     setCheckingOut(true);
+    const loadingToast = toast.loading("Processing checkout...");
     try {
       const ok = await checkout(shippingAddress, paymentMethod);
+      toast.dismiss(loadingToast);
       if (ok) {
         setOrderSuccess(true);
         setShippingAddress("");
         setActiveTab("orders");
+        toast.success("Checkout Successfully");
         setTimeout(() => setOrderSuccess(false), 5000);
       } else {
-        alert("Failed to place order.");
+        toast.error("Failed to place order.");
       }
     } catch (err) {
       console.error(err);
+      toast.dismiss(loadingToast);
+      toast.error("An error occurred during checkout.");
     } finally {
       setCheckingOut(false);
     }
@@ -349,22 +354,24 @@ function UserDashboardContent() {
                   <p className="text-gray-500 text-center py-16 text-xs">No favorite items added yet.</p>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {favorites.map((p) => {
-                      const pId = p._id || p.id || "";
+                    {favorites.map((fav) => {
+                      const prod = fav.product;
+                      if (!prod) return null;
+                      const prodId = prod._id || prod.id || fav.productId || "";
                       return (
-                        <div key={pId} className="flex gap-4 p-4 rounded-xl bg-gray-50 dark:bg-slate-900/30 border border-card-border items-center">
-                          <img src={p.image} alt={p.title} className="w-16 h-16 rounded-lg object-cover flex-shrink-0" />
+                        <div key={fav._id} className="flex gap-4 p-4 rounded-xl bg-gray-50 dark:bg-slate-900/30 border border-card-border items-center">
+                          <img src={prod.image} alt={prod.title} className="w-16 h-16 rounded-lg object-cover flex-shrink-0" />
                           <div className="flex-1 min-w-0">
-                            <h4 className="font-bold text-xs truncate">{p.title}</h4>
-                            <p className="text-[10px] text-gray-400 mt-0.5">${p.price}</p>
+                            <h4 className="font-bold text-xs truncate">{prod.title}</h4>
+                            <p className="text-[10px] text-gray-400 mt-0.5">${prod.price}</p>
                             <button
-                              onClick={() => addToCart(pId, 1)}
+                              onClick={() => addToCart(prodId, 1)}
                               className="mt-2 px-3 py-1 bg-brand text-white text-[10px] font-bold rounded hover:bg-brand-hover transition-colors flex items-center gap-1"
                             >
                               <ShoppingCart size={10} /> Add to Cart
                             </button>
                           </div>
-                          <button onClick={() => toggleFavorite(pId)} className="text-red-500 p-2">
+                          <button onClick={() => toggleFavorite(prodId)} className="text-red-500 p-2">
                             <Trash2 size={16} />
                           </button>
                         </div>

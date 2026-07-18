@@ -42,6 +42,8 @@ export default function AdminDashboard() {
   const [salesChart, setSalesChart] = useState<{ name: string; Sales: number }[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [users, setUsers] = useState<User[]>([]);
+  const [inquiries, setInquiries] = useState<any[]>([]);
+  const [subscribers, setSubscribers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:5000";
@@ -89,6 +91,30 @@ export default function AdminDashboard() {
         }
       } else {
         console.error("Admin users response was not JSON:", await usersRes.text());
+      }
+
+      // 4. Fetch Inquiries
+      const inqRes = await fetch(`${BASE_URL}/api/admin/inquiries`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      const inqContentType = inqRes.headers.get("content-type");
+      if (inqContentType && inqContentType.includes("application/json")) {
+        const inqData = await inqRes.json();
+        if (inqData.success) {
+          setInquiries(inqData.inquiries || []);
+        }
+      }
+
+      // 5. Fetch Subscribers
+      const subRes = await fetch(`${BASE_URL}/api/admin/subscribers`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      const subContentType = subRes.headers.get("content-type");
+      if (subContentType && subContentType.includes("application/json")) {
+        const subData = await subRes.json();
+        if (subData.success) {
+          setSubscribers(subData.subscribers || []);
+        }
       }
     } catch (err) {
       console.error("Admin fetching error:", err);
@@ -412,60 +438,68 @@ export default function AdminDashboard() {
             {/* INQUIRIES PANEL */}
             {activeTab === "inquiries" && (
               <div className="space-y-6">
-                <h2 className="text-xl font-bold pb-4 border-b border-card-border">Customer Inquiries</h2>
-                <div className="space-y-4">
-                  {[
-                    { name: "John Doe", email: "john@example.com", message: "Is the premium smartphone in stock soon?", date: "2026-07-18" },
-                    { name: "Sarah Connor", email: "sarah@cyberdyne.com", message: "I would like to request bulk pricing for corporate laptops.", date: "2026-07-17" },
-                    { name: "Bruce Wayne", email: "bruce@waynecorp.com", message: "Do you offer priority overnight shipping for special tech gear?", date: "2026-07-16" }
-                  ].map((inq, i) => (
-                    <div key={i} className="p-4 bg-gray-50 dark:bg-slate-900/30 rounded-xl border border-card-border">
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <h4 className="font-bold text-sm text-gray-800 dark:text-gray-200">{inq.name}</h4>
-                          <span className="text-[10px] text-gray-500">{inq.email}</span>
+                <h2 className="text-xl font-bold pb-4 border-b border-card-border">Customer Inquiries ({inquiries.length})</h2>
+                {inquiries.length === 0 ? (
+                  <p className="text-gray-500 text-center py-16 text-xs">No customer inquiries found.</p>
+                ) : (
+                  <div className="space-y-4">
+                    {inquiries.map((inq) => {
+                      const inqId = inq._id || inq.id || "";
+                      const inqDate = inq.createdAt ? new Date(inq.createdAt).toLocaleDateString() : "Recently";
+                      return (
+                        <div key={inqId} className="p-4 glass-panel rounded-xl border border-card-border">
+                          <div className="flex justify-between items-start mb-2">
+                            <div>
+                              <h4 className="font-bold text-sm text-gray-800 dark:text-gray-200">{inq.name}</h4>
+                              <span className="text-[10px] text-gray-500">{inq.email}</span>
+                            </div>
+                            <span className="text-[10px] text-gray-400 font-medium">{inqDate}</span>
+                          </div>
+                          <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed mt-2">{inq.message}</p>
                         </div>
-                        <span className="text-[10px] text-gray-400 font-medium">{inq.date}</span>
-                      </div>
-                      <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed mt-2">{inq.message}</p>
-                    </div>
-                  ))}
-                </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             )}
 
             {/* SUBSCRIBERS PANEL */}
             {activeTab === "subscribers" && (
               <div className="space-y-6">
-                <h2 className="text-xl font-bold pb-4 border-b border-card-border">Newsletter Subscribers</h2>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs border-collapse">
-                    <thead>
-                      <tr className="border-b border-card-border text-gray-400 font-bold">
-                        <th className="pb-3">Subscriber Email</th>
-                        <th className="pb-3">Status</th>
-                        <th className="pb-3 text-right">Subscription Date</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-card-border">
-                      {[
-                        { email: "newsletter1@example.com", status: "Active", date: "2026-07-18" },
-                        { email: "subscriber2@yahoo.com", status: "Active", date: "2026-07-15" },
-                        { email: "customer_deals@gmail.com", status: "Active", date: "2026-07-10" }
-                      ].map((sub, i) => (
-                        <tr key={i} className="hover:bg-gray-50/50 dark:hover:bg-slate-900/10">
-                          <td className="py-3.5 font-semibold text-gray-800 dark:text-gray-200">{sub.email}</td>
-                          <td className="py-3.5">
-                            <span className="bg-cyan-500/10 text-cyan-500 px-2 py-0.5 rounded text-[10px] font-bold uppercase">
-                              {sub.status}
-                            </span>
-                          </td>
-                          <td className="py-3.5 text-right text-gray-500">{sub.date}</td>
+                <h2 className="text-xl font-bold pb-4 border-b border-card-border">Newsletter Subscribers ({subscribers.length})</h2>
+                {subscribers.length === 0 ? (
+                  <p className="text-gray-500 text-center py-16 text-xs">No newsletter subscribers found.</p>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs border-collapse">
+                      <thead>
+                        <tr className="border-b border-card-border text-gray-400 font-bold">
+                          <th className="pb-3">Subscriber Email</th>
+                          <th className="pb-3">Status</th>
+                          <th className="pb-3 text-right">Subscription Date</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                      </thead>
+                      <tbody className="divide-y divide-card-border">
+                        {subscribers.map((sub) => {
+                          const subId = sub._id || sub.id || sub.email || "";
+                          const subDate = sub.createdAt ? new Date(sub.createdAt).toLocaleDateString() : "Recently";
+                          return (
+                            <tr key={subId} className="hover:bg-gray-50/50 dark:hover:bg-slate-900/10">
+                              <td className="py-3.5 font-semibold text-gray-800 dark:text-gray-200">{sub.email}</td>
+                              <td className="py-3.5">
+                                <span className="bg-cyan-500/10 text-cyan-500 px-2 py-0.5 rounded text-[10px] font-bold uppercase">
+                                  {sub.status || "Active"}
+                                </span>
+                              </td>
+                              <td className="py-3.5 text-right text-gray-500">{subDate}</td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
             )}
 

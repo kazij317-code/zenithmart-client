@@ -217,11 +217,9 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
 
                 <button
                   onClick={() => toggleFavorite(pId)}
-                  className={`p-3 rounded-xl border border-card-border hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors ${
-                    isFavorite(pId) ? "bg-red-50 text-red-500 border-red-200" : "text-gray-400"
-                  }`}
+                  className="p-3 rounded-xl border border-card-border hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
                 >
-                  <Heart size={20} fill={isFavorite(pId) ? "currentColor" : "none"} />
+                  <Heart size={20} className={isFavorite(pId) ? "fill-rose-500 text-rose-500" : "text-gray-400"} />
                 </button>
               </div>
             )}

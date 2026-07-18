@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import AIChatBot from "@/components/AIChatBot";
 import { useApp } from "@/context/AppContext";
 import { Sparkles, ArrowRight, ShieldCheck, Truck, Headphones, RotateCcw, Star, Percent, Heart } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 interface Product {
   _id?: string;
@@ -24,8 +25,34 @@ export default function Home() {
   const { addToCart, toggleFavorite, isFavorite } = useApp();
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [subscribeEmail, setSubscribeEmail] = useState("");
 
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:5000";
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!subscribeEmail.trim()) return;
+    const loadingToast = toast.loading("Subscribing...");
+    try {
+      const res = await fetch(`${BASE_URL}/api/subscribers`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: subscribeEmail })
+      });
+      const data = await res.json();
+      toast.dismiss(loadingToast);
+      if (data.success) {
+        toast.success("Subscribed successfully!");
+        setSubscribeEmail("");
+      } else {
+        toast.error(data.error || "Failed to subscribe.");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.dismiss(loadingToast);
+      toast.error("An error occurred during subscription.");
+    }
+  };
 
   useEffect(() => {
     const fetchFeatured = async () => {
@@ -158,13 +185,9 @@ export default function Home() {
                       <img src={p.image} alt={p.title} className="w-full h-full object-cover" />
                       <button
                         onClick={() => toggleFavorite(pId)}
-                        className={`absolute top-4 right-4 p-2 rounded-full backdrop-blur-md shadow-md border border-white/20 transition-all ${
-                          isFavorite(pId)
-                            ? "bg-red-500 text-white"
-                            : "bg-white/70 text-gray-800 hover:bg-white"
-                        }`}
+                        className="absolute top-4 right-4 p-2 rounded-xl bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 shadow-md backdrop-blur-sm transition-all hover:scale-105"
                       >
-                        <Heart size={16} fill={isFavorite(pId) ? "white" : "none"} />
+                        <Heart size={16} className={isFavorite(pId) ? "fill-rose-500 text-rose-500" : "text-slate-400 dark:text-gray-500"} />
                       </button>
                     </div>
                     <div className="p-5 flex flex-col flex-1">
@@ -316,16 +339,18 @@ export default function Home() {
             <p className="text-gray-500 dark:text-gray-300 max-w-lg mx-auto mb-8 text-sm">
               Subscribe to get exclusive product drops, member-only discounts, and personalized shopping notifications from ZenithBot.
             </p>
-            <form onSubmit={(e) => { e.preventDefault(); alert("Thanks for subscribing!"); }} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+            <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
               <input
                 type="email"
                 placeholder="Enter your email address"
                 required
+                value={subscribeEmail}
+                onChange={(e) => setSubscribeEmail(e.target.value)}
                 className="flex-1 glass-input px-4 py-2.5 rounded-xl text-sm focus:outline-none"
               />
               <button
                 type="submit"
-                className="bg-brand hover:bg-brand-hover text-white font-bold px-6 py-2.5 rounded-xl text-sm transition-all shadow-md"
+                className="bg-brand hover:bg-brand-hover text-white font-bold px-6 py-2.5 rounded-xl text-sm transition-all shadow-md cursor-pointer"
               >
                 Subscribe
               </button>
