@@ -397,42 +397,58 @@ function UserDashboardContent() {
                 {orderHistory.length === 0 ? (
                   <p className="text-gray-500 text-center py-16 text-xs">You have not placed any orders yet.</p>
                 ) : (
-                  <div className="space-y-6">
-                    {orderHistory.map((order, idx) => (
-                      <div key={order._id || idx} className="p-5 rounded-2xl bg-gray-50 dark:bg-slate-900/30 border border-card-border space-y-3">
-                        <div className="flex justify-between items-center border-b border-card-border pb-3 text-xs">
-                          <div>
-                            <span className="text-gray-400">Order ID: </span>
-                            <span className="font-bold">{(order._id || "").slice(-8).toUpperCase()}</span>
-                          </div>
-                          <div className="text-gray-400">
-                            {order.createdAt ? new Date(order.createdAt).toLocaleDateString() : ""}
-                          </div>
-                        </div>
-
-                        <div className="space-y-3">
-                          {order.items.map((item, i) => (
-                            <div key={i} className="flex gap-3 items-center">
-                              <img src={item.image} alt={item.title} className="w-10 h-10 rounded object-cover flex-shrink-0" />
-                              <div className="flex-1 min-w-0">
-                                <h5 className="font-semibold text-xs truncate">{item.title}</h5>
-                                <p className="text-[10px] text-gray-400">{item.quantity} x ${item.price}</p>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-
-                        <div className="flex justify-between items-center pt-3 border-t border-card-border text-xs">
-                          <div>
-                            <span className="text-gray-400">Status: </span>
-                            <span className="font-bold text-indigo-500">{order.status || "Processing"}</span>
-                          </div>
-                          <div className="font-bold text-sm">
-                            Total: ${order.totalAmount}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+                  <div className="overflow-x-auto rounded-t-2xl border border-card-border">
+                    <table className="w-full text-left text-xs border-collapse">
+                      <thead>
+                        <tr className="bg-[#6b7280] dark:bg-slate-800 text-[#ffffff] font-extrabold uppercase tracking-wider">
+                          <th className="p-4">Order ID</th>
+                          <th className="p-4">Product with image</th>
+                          <th className="p-4">Quantity</th>
+                          <th className="p-4">Unit Price</th>
+                          <th className="p-4">Date</th>
+                          <th className="p-4">Total Price</th>
+                          <th className="p-4">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-card-border">
+                        {orderHistory.flatMap((order) =>
+                          order.items.map((item, i) => {
+                            const orderId = (order._id || "").slice(-8).toUpperCase();
+                            const orderDate = order.createdAt ? new Date(order.createdAt).toLocaleDateString() : "Recently";
+                            return (
+                              <tr key={`${order._id}-${i}`} className="hover:bg-gray-50/50 dark:hover:bg-slate-900/10">
+                                <td className="p-4 font-mono font-bold text-gray-700 dark:text-gray-300">
+                                  {i === 0 ? orderId : ""}
+                                </td>
+                                <td className="p-4 flex items-center gap-3">
+                                  <img src={item.image} alt={item.title} className="w-9 h-9 rounded object-cover flex-shrink-0" />
+                                  <span className="font-semibold text-gray-800 dark:text-gray-200 truncate max-w-[150px]">{item.title}</span>
+                                </td>
+                                <td className="p-4 text-gray-500 font-medium">{item.quantity}</td>
+                                <td className="p-4 text-gray-500 font-medium">${item.price}</td>
+                                <td className="p-4 text-gray-500 font-medium">
+                                  {i === 0 ? orderDate : ""}
+                                </td>
+                                <td className="p-4 font-bold text-gray-800 dark:text-gray-200">
+                                  {i === 0 ? `$${order.totalAmount}` : ""}
+                                </td>
+                                <td className="p-4">
+                                  {i === 0 ? (
+                                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
+                                      order.status === "Confirmed"
+                                        ? "bg-emerald-100 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400"
+                                        : "bg-amber-100 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400"
+                                    }`}>
+                                      {order.status || "Pending"}
+                                    </span>
+                                  ) : ""}
+                                </td>
+                              </tr>
+                            );
+                          })
+                        )}
+                      </tbody>
+                    </table>
                   </div>
                 )}
               </div>

@@ -13,6 +13,7 @@ export default function Contact() {
   const { user } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -28,7 +29,7 @@ export default function Contact() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || !email.trim() || !message.trim()) {
+    if (!name.trim() || !email.trim() || !subject.trim() || !message.trim()) {
       toast.error("Please fill in all fields.");
       return;
     }
@@ -38,12 +39,13 @@ export default function Contact() {
       const res = await fetch(`${BASE_URL}/api/inquiries`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, message })
+        body: JSON.stringify({ name, email, subject, message })
       });
       const data = await res.json();
       toast.dismiss(loadingToast);
       if (data.success) {
         setSubmitted(true);
+        setSubject("");
         setMessage("");
         toast.success("Inquiry sent successfully!");
       } else {
@@ -143,6 +145,18 @@ export default function Contact() {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="john@example.com"
+                      className="w-full glass-input px-3.5 py-2 rounded-xl text-sm"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-[10px] font-bold uppercase text-gray-400 block mb-1">Subject</label>
+                    <input
+                      type="text"
+                      required
+                      value={subject}
+                      onChange={(e) => setSubject(e.target.value)}
+                      placeholder="What is this inquiry about?"
                       className="w-full glass-input px-3.5 py-2 rounded-xl text-sm"
                     />
                   </div>
