@@ -7,7 +7,7 @@ import AIChatBot from "@/components/AIChatBot";
 import { useAuth } from "@/context/AuthContext";
 import { Plus, Users, DollarSign, Package, ShoppingCart, Ban, ShieldCheck, Trash2, Mail, Sparkles, LogOut, Edit, Eye, X, CreditCard, Shield, Grid, PlusCircle, Compass, User } from "lucide-react";
 import Link from "next/link";
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from "recharts";
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 
 interface Stats {
   productCount: number;
@@ -472,6 +472,33 @@ export default function AdminDashboard() {
                     </div>
                   </div>
                 </div>
+
+                {/* Sales Curve Chart */}
+                {salesChart.length > 0 && (
+                  <div className="bg-[#ffffff] dark:bg-slate-900 rounded-3xl p-6 border border-slate-800 dark:border-slate-700 shadow-sm space-y-4">
+                    <div>
+                      <h3 className="font-extrabold text-sm text-gray-800 dark:text-gray-200">Monthly Revenue Trends</h3>
+                      <p className="text-[10px] text-gray-400 font-medium">Monthly shop earnings overview</p>
+                    </div>
+                    <div className="h-64 w-full">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <AreaChart data={salesChart} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                          <defs>
+                            <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
+                              <stop offset="5%" stopColor="#4F46E5" stopOpacity={0.2}/>
+                              <stop offset="95%" stopColor="#4F46E5" stopOpacity={0}/>
+                            </linearGradient>
+                          </defs>
+                          <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" className="dark:stroke-slate-800" />
+                          <XAxis dataKey="name" stroke="#a0aec0" fontSize={10} tickLine={false} />
+                          <YAxis stroke="#a0aec0" fontSize={10} tickLine={false} />
+                          <Tooltip contentStyle={{ background: "#ffffff", borderRadius: "12px", border: "1px solid #cbd5e1", fontSize: "11px" }} />
+                          <Area type="monotone" dataKey="Sales" stroke="#4F46E5" strokeWidth={2.5} fillOpacity={1} fill="url(#colorSales)" />
+                        </AreaChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 

@@ -3,6 +3,7 @@ import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
 import { AppProvider } from "@/context/AppContext";
+import QueryProvider from "@/context/QueryProvider";
 import { Toaster } from "react-hot-toast";
 
 const inter = Inter({
@@ -31,12 +32,14 @@ export default function RootLayout({
       className={`${inter.variable} ${outfit.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-slate-dark text-foreground font-sans">
-        <AuthProvider>
-          <AppProvider>
-            {children}
-            <Toaster position="top-center" reverseOrder={false} />
-          </AppProvider>
-        </AuthProvider>
+        <QueryProvider>
+          <AuthProvider>
+            <AppProvider>
+              {children}
+              <Toaster position="top-center" reverseOrder={false} />
+            </AppProvider>
+          </AuthProvider>
+        </QueryProvider>
       </body>
     </html>
   );
