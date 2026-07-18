@@ -261,14 +261,14 @@ function UserDashboardContent() {
                               <p className="text-[10px] text-gray-400 mt-0.5">${prod.price} each</p>
                               <div className="flex items-center gap-2 mt-2">
                                 <button
-                                  onClick={() => addToCart(prodId, item.quantity - 1)}
+                                  onClick={() => addToCart(prodId, item.quantity - 1, true)}
                                   className="px-2 py-0.5 bg-gray-200 dark:bg-slate-800 rounded text-xs font-bold"
                                 >
                                   -
                                 </button>
                                 <span className="text-xs font-semibold">{item.quantity}</span>
                                 <button
-                                  onClick={() => addToCart(prodId, item.quantity + 1)}
+                                  onClick={() => addToCart(prodId, item.quantity + 1, true)}
                                   className="px-2 py-0.5 bg-gray-200 dark:bg-slate-800 rounded text-xs font-bold"
                                 >
                                   +

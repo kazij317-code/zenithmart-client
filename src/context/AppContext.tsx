@@ -38,7 +38,7 @@ interface AppContextType {
   favorites: FavoriteItem[];
   isLoadingCart: boolean;
   isLoadingFavs: boolean;
-  addToCart: (productId: string, qty?: number) => Promise<void>;
+  addToCart: (productId: string, qty?: number, isAbsolute?: boolean) => Promise<void>;
   removeFromCart: (productId: string) => Promise<void>;
   clearCart: () => Promise<void>;
   toggleFavorite: (productId: string) => Promise<void>;
@@ -118,7 +118,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
 
   const refreshCartAndFavs = () => setRefreshTrigger(prev => prev + 1);
 
-  const addToCart = async (productId: string, qty = 1) => {
+  const addToCart = async (productId: string, qty = 1, isAbsolute = false) => {
     if (!user) {
       alert("Please login to add items to cart.");
       return;
@@ -131,7 +131,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${sessionToken}`
         },
-        body: JSON.stringify({ email: user.email, productId, quantity: qty })
+        body: JSON.stringify({ email: user.email, productId, quantity: qty, isAbsolute })
       });
       const data = await response.json();
       if (data.success) {
