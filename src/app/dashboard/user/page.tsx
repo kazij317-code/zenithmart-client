@@ -8,6 +8,7 @@ import { useApp } from "@/context/AppContext";
 import { useAuth } from "@/context/AuthContext";
 import { ShoppingCart, Heart, Package, Trash2, MapPin, CreditCard, CheckCircle, User, LogOut, X } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { toast } from "react-hot-toast";
 
 interface OrderItem {
   productId: string;
@@ -57,21 +58,24 @@ function UserDashboardContent() {
   const handleUpdateProfileSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!updateName.trim()) {
-      alert("Full name is required.");
+      toast.error("Full name is required.");
       return;
     }
     setUpdating(true);
+    const loadingToast = toast.loading("Updating profile...");
     try {
       const res = await updateProfile(updateName, updateImage || undefined);
+      toast.dismiss(loadingToast);
       if (res.success) {
         setIsUpdateModalOpen(false);
-        alert("Profile updated successfully!");
+        toast.success("Profile updated successfully!");
       } else {
-        alert(res.error || "Failed to update profile.");
+        toast.error(res.error || "Failed to update profile.");
       }
     } catch (err) {
       console.error(err);
-      alert("An error occurred while updating profile.");
+      toast.dismiss(loadingToast);
+      toast.error("An error occurred while updating profile.");
     } finally {
       setUpdating(false);
     }
@@ -465,10 +469,10 @@ function UserDashboardContent() {
                 {/* UPDATE USER MODAL */}
                 {isUpdateModalOpen && (
                   <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-                    <div className="relative w-full max-w-sm bg-white dark:bg-[#090d16] border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-2xl animate-in fade-in zoom-in-95 text-slate-800 dark:text-white">
+                    <div className="relative w-full max-w-sm glass-panel rounded-3xl p-8 shadow-2xl animate-in fade-in zoom-in-95">
                       <button
                         onClick={() => setIsUpdateModalOpen(false)}
-                        className="absolute right-5 top-5 text-slate-400 hover:text-slate-700 dark:text-slate-500 dark:hover:text-white cursor-pointer"
+                        className="absolute right-5 top-5 text-slate-400 hover:text-slate-700 dark:text-slate-500 dark:hover:text-white cursor-pointer bg-transparent border-none"
                       >
                         <X size={18} />
                       </button>
@@ -477,12 +481,12 @@ function UserDashboardContent() {
                         <div className="w-14 h-14 rounded-full border border-cyan-500/30 flex items-center justify-center text-cyan-500 dark:text-cyan-400 mb-4 bg-cyan-500/5 dark:bg-cyan-950/20">
                           <User size={24} />
                         </div>
-                        <h3 className="text-lg font-bold text-slate-800 dark:text-white text-center">Update User</h3>
+                        <h3 className="text-lg font-bold text-center">Update User</h3>
                       </div>
 
                       <form onSubmit={handleUpdateProfileSubmit} className="space-y-5">
                         <div>
-                          <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
+                          <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-2">
                             FULL NAME
                           </label>
                           <input
@@ -491,12 +495,12 @@ function UserDashboardContent() {
                             value={updateName}
                             onChange={(e) => setUpdateName(e.target.value)}
                             placeholder="Enter your name"
-                            className="w-full bg-slate-50 dark:bg-[#1e293b]/70 border border-slate-300 dark:border-slate-700/60 focus:border-cyan-500 text-slate-800 dark:text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-cyan-500 transition-all placeholder-slate-400 dark:placeholder-slate-500"
+                            className="w-full glass-input px-4 py-3 rounded-xl text-sm focus:outline-none"
                           />
                         </div>
 
                         <div>
-                          <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
+                          <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-2">
                             AVATAR IMAGE URL
                           </label>
                           <input
@@ -504,7 +508,7 @@ function UserDashboardContent() {
                             value={updateImage}
                             onChange={(e) => setUpdateImage(e.target.value)}
                             placeholder="Enter avatar URL"
-                            className="w-full bg-slate-50 dark:bg-[#1e293b]/70 border border-slate-300 dark:border-slate-700/60 focus:border-cyan-500 text-slate-800 dark:text-white rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-1 focus:ring-cyan-500 transition-all placeholder-slate-400 dark:placeholder-slate-500"
+                            className="w-full glass-input px-4 py-3 rounded-xl text-sm focus:outline-none"
                           />
                         </div>
 
@@ -512,7 +516,7 @@ function UserDashboardContent() {
                           <button
                             type="button"
                             onClick={() => setIsUpdateModalOpen(false)}
-                            className="py-3 bg-slate-100 dark:bg-[#1e293b] hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-600 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white rounded-xl text-xs font-bold transition-all border border-slate-300 dark:border-slate-700/60 cursor-pointer"
+                            className="py-3 bg-slate-100 dark:bg-[#1e293b] hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-600 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white rounded-xl text-xs font-bold transition-all border border-card-border cursor-pointer"
                           >
                             Cancel
                           </button>
