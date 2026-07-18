@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useAuth } from "./AuthContext";
+import toast from "react-hot-toast";
 
 interface Product {
   _id?: string;
@@ -24,9 +25,17 @@ interface CartItem {
   product?: Product;
 }
 
+interface FavoriteItem {
+  _id?: string;
+  id?: string;
+  email: string;
+  productId: string;
+  product?: Product;
+}
+
 interface AppContextType {
   cart: CartItem[];
-  favorites: Product[];
+  favorites: FavoriteItem[];
   isLoadingCart: boolean;
   isLoadingFavs: boolean;
   addToCart: (productId: string, qty?: number) => Promise<void>;
@@ -43,7 +52,7 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const { user } = useAuth();
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [favorites, setFavorites] = useState<Product[]>([]);
+  const [favorites, setFavorites] = useState<FavoriteItem[]>([]);
   const [isLoadingCart, setIsLoadingCart] = useState(false);
   const [isLoadingFavs, setIsLoadingFavs] = useState(false);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
@@ -170,7 +179,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
 
   const toggleFavorite = async (productId: string) => {
     if (!user) {
-      alert("Please login to manage favorites.");
+      toast.error("Please login to manage favorites.");
       return;
     }
     const sessionToken = localStorage.getItem("better-auth.session_token") || "";
@@ -185,6 +194,11 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
       });
       const data = await response.json();
       if (data.success) {
+        if (data.isFavorite) {
+          toast.success("Added to Favourite");
+        } else {
+          toast.success("Removed from Favourite");
+        }
         refreshCartAndFavs();
       }
     } catch (error) {
@@ -193,7 +207,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const isFavorite = (productId: string) => {
-    return favorites.some(fav => fav._id === productId || fav.id === productId);
+    return favorites.some(fav => fav.productId === productId || fav.product?._id === productId || fav.product?.id === productId);
   };
 
   const checkout = async (shippingAddress: string, paymentMethod: string) => {

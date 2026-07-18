@@ -22,11 +22,26 @@ export default function AddItem() {
   const [image, setImage] = useState("");
   const [loading, setLoading] = useState(false);
   
-  // Specifications mapping (optional custom specs)
-  const [specKey1, setSpecKey1] = useState("");
-  const [specVal1, setSpecVal1] = useState("");
-  const [specKey2, setSpecKey2] = useState("");
-  const [specVal2, setSpecVal2] = useState("");
+  const [image2, setImage2] = useState("");
+  const [image3, setImage3] = useState("");
+
+  const [specs, setSpecs] = useState([
+    { key: "Display", value: "Full-Color Micro OLED AR Display" },
+    { key: "AI Processor", value: "Zenith Neural AI Chip" },
+    { key: "Connectivity", value: "Bluetooth 5.4 & Wi-Fi 6" },
+    { key: "Camera", value: "Dual 12MP Cameras" },
+    { key: "Battery Life", value: "Up to 12 Hours" },
+    { key: "Charging", value: "USB-C Fast Charging" },
+    { key: "Audio", value: "Open-Ear Stereo Speakers" },
+    { key: "Microphone", value: "AI Noise Cancellation" },
+    { key: "Water Resistance", value: "IP54" },
+    { key: "Frame Material", value: "Aerospace-Grade Aluminum" },
+    { key: "Weight", value: "72g" },
+    { key: "Compatibility", value: "Android & iOS" },
+    { key: "Voice Assistant", value: "Built-in Zenith AI Assistant" },
+    { key: "Color", value: "Matte Black" },
+    { key: "Warranty", value: "1 Year Limited Warranty" }
+  ]);
 
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:5000";
 
@@ -41,8 +56,11 @@ export default function AddItem() {
     const token = localStorage.getItem("better-auth.session_token") || "";
 
     const specifications: Record<string, string> = {};
-    if (specKey1 && specVal1) specifications[specKey1] = specVal1;
-    if (specKey2 && specVal2) specifications[specKey2] = specVal2;
+    specs.forEach((item) => {
+      if (item.key && item.value) {
+        specifications[item.key] = item.value;
+      }
+    });
 
     const productPayload = {
       title,
@@ -52,6 +70,7 @@ export default function AddItem() {
       category,
       stock: Number(stock),
       image,
+      images: [image, image2, image3].filter(Boolean),
       specifications
     };
 
@@ -167,19 +186,47 @@ export default function AddItem() {
               </div>
             </div>
 
-            {/* Main Image URL */}
-            <div>
-              <label className="text-[10px] font-bold uppercase text-gray-400 block mb-1">Main Image URL *</label>
-              <div className="relative">
-                <input
-                  type="url"
-                  required
-                  value={image}
-                  onChange={(e) => setImage(e.target.value)}
-                  placeholder="https://images.unsplash.com/..."
-                  className="w-full glass-input pl-10 pr-4 py-2.5 rounded-xl text-sm"
-                />
-                <Image size={16} className="absolute left-3.5 top-3.5 text-gray-400" />
+            {/* Main Image URL & Optional Image URLs */}
+            <div className="sm:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="text-[10px] font-bold uppercase text-gray-400 block mb-1">Main Image URL *</label>
+                <div className="relative">
+                  <input
+                    type="url"
+                    required
+                    value={image}
+                    onChange={(e) => setImage(e.target.value)}
+                    placeholder="https://images.unsplash.com/..."
+                    className="w-full glass-input pl-10 pr-4 py-2.5 rounded-xl text-sm"
+                  />
+                  <Image size={16} className="absolute left-3.5 top-3.5 text-gray-400" />
+                </div>
+              </div>
+              <div>
+                <label className="text-[10px] font-bold uppercase text-gray-400 block mb-1">Image URL 2 (Optional)</label>
+                <div className="relative">
+                  <input
+                    type="url"
+                    value={image2}
+                    onChange={(e) => setImage2(e.target.value)}
+                    placeholder="https://images.unsplash.com/..."
+                    className="w-full glass-input pl-10 pr-4 py-2.5 rounded-xl text-sm"
+                  />
+                  <Image size={16} className="absolute left-3.5 top-3.5 text-gray-400" />
+                </div>
+              </div>
+              <div>
+                <label className="text-[10px] font-bold uppercase text-gray-400 block mb-1">Image URL 3 (Optional)</label>
+                <div className="relative">
+                  <input
+                    type="url"
+                    value={image3}
+                    onChange={(e) => setImage3(e.target.value)}
+                    placeholder="https://images.unsplash.com/..."
+                    className="w-full glass-input pl-10 pr-4 py-2.5 rounded-xl text-sm"
+                  />
+                  <Image size={16} className="absolute left-3.5 top-3.5 text-gray-400" />
+                </div>
               </div>
             </div>
 
@@ -218,37 +265,33 @@ export default function AddItem() {
             {/* Technical Specifications (Optional specs) */}
             <div className="sm:col-span-2 border-t border-card-border pt-4">
               <h3 className="text-xs font-bold text-gray-500 mb-3">Add Custom Technical Specifications (Optional)</h3>
-              <div className="grid grid-cols-2 gap-4 mb-3">
-                <input
-                  type="text"
-                  placeholder="Spec Name (e.g. Connection)"
-                  value={specKey1}
-                  onChange={(e) => setSpecKey1(e.target.value)}
-                  className="w-full glass-input px-3 py-2 rounded-xl text-xs"
-                />
-                <input
-                  type="text"
-                  placeholder="Spec Value (e.g. Bluetooth 5.2)"
-                  value={specVal1}
-                  onChange={(e) => setSpecVal1(e.target.value)}
-                  className="w-full glass-input px-3 py-2 rounded-xl text-xs"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <input
-                  type="text"
-                  placeholder="Spec Name (e.g. Weight)"
-                  value={specKey2}
-                  onChange={(e) => setSpecKey2(e.target.value)}
-                  className="w-full glass-input px-3 py-2 rounded-xl text-xs"
-                />
-                <input
-                  type="text"
-                  placeholder="Spec Value (e.g. 250g)"
-                  value={specVal2}
-                  onChange={(e) => setSpecVal2(e.target.value)}
-                  className="w-full glass-input px-3 py-2 rounded-xl text-xs"
-                />
+              <div className="space-y-3">
+                {specs.map((item, index) => (
+                  <div key={index} className="grid grid-cols-2 gap-4">
+                    <input
+                      type="text"
+                      placeholder="Spec Name (e.g. Connection)"
+                      value={item.key}
+                      onChange={(e) => {
+                        const updated = [...specs];
+                        updated[index].key = e.target.value;
+                        setSpecs(updated);
+                      }}
+                      className="w-full glass-input px-3 py-2.5 rounded-xl text-xs"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Spec Value (e.g. Bluetooth 5.2)"
+                      value={item.value}
+                      onChange={(e) => {
+                        const updated = [...specs];
+                        updated[index].value = e.target.value;
+                        setSpecs(updated);
+                      }}
+                      className="w-full glass-input px-3 py-2.5 rounded-xl text-xs"
+                    />
+                  </div>
+                ))}
               </div>
             </div>
 

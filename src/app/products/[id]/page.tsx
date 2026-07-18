@@ -5,8 +5,16 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AIChatBot from "@/components/AIChatBot";
 import { useApp } from "@/context/AppContext";
+import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
-import { Heart, ShoppingCart, Star, Sparkles, ShieldCheck, Check } from "lucide-react";
+import { Heart, ShoppingCart, Star, Sparkles, ShieldCheck, Check, Send } from "lucide-react";
+
+interface Review {
+  name: string;
+  rating: number;
+  comment: string;
+  createdAt?: string;
+}
 
 interface Product {
   _id?: string;
@@ -21,6 +29,7 @@ interface Product {
   images?: string[];
   stock: number;
   specifications: Record<string, string>;
+  reviews?: Review[];
 }
 
 export default function ProductDetails({ params }: { params: Promise<{ id: string }> }) {
@@ -28,12 +37,63 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
   const id = resolvedParams.id;
 
   const { addToCart, toggleFavorite, isFavorite } = useApp();
+  const { user } = useAuth();
   const [product, setProduct] = useState<Product | null>(null);
   const [recommendations, setRecommendations] = useState<Product[]>([]);
   const [activeImage, setActiveImage] = useState("");
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
+
+  const [reviewName, setReviewName] = useState("");
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState("");
+  const [submittingReview, setSubmittingReview] = useState(false);
+
+  useEffect(() => {
+    if (user && user.name) {
+      setReviewName(user.name);
+    }
+  }, [user]);
+
+  const handleReviewSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!reviewName || !reviewComment) {
+      alert("Please fill in all fields.");
+      return;
+    }
+    setSubmittingReview(true);
+    try {
+      const res = await fetch(`${BASE_URL}/api/products/${id}/reviews`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: reviewName,
+          rating: reviewRating,
+          comment: reviewComment
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setProduct((prev) => {
+          if (!prev) return null;
+          const updatedReviews = prev.reviews ? [...prev.reviews, data.review] : [data.review];
+          return {
+            ...prev,
+            reviews: updatedReviews
+          };
+        });
+        setReviewName(user?.name || "");
+        setReviewComment("");
+        setReviewRating(5);
+        alert("Review posted successfully!");
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
 
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:5000";
 
@@ -217,9 +277,20 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
 
                 <button
                   onClick={() => toggleFavorite(pId)}
-                  className="p-3 rounded-xl border border-card-border hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors"
+                  className={`p-3 rounded-xl transition-all duration-300 ${
+                    isFavorite(pId)
+                      ? "bg-[#180A18] border border-transparent"
+                      : "bg-[#F0F4F8] border border-[#3A4D62] hover:bg-[#E2E8F0] dark:bg-slate-900 dark:border-slate-700 dark:hover:bg-slate-800"
+                  }`}
                 >
-                  <Heart size={20} className={isFavorite(pId) ? "fill-rose-500 text-rose-500" : "text-gray-400"} />
+                  <Heart
+                    size={20}
+                    className={`transition-all duration-300 ${
+                      isFavorite(pId)
+                        ? "fill-[#FF2D55] text-[#FF2D55] scale-110"
+                        : "text-[#3A4D62] dark:text-gray-400"
+                    }`}
+                  />
                 </button>
               </div>
             )}
@@ -249,6 +320,108 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
                 <div className="text-xs text-gray-500">Standard specifications apply.</div>
               )}
             </div>
+          </div>
+        </div>
+
+        {/* Reviews Section */}
+        <div className="border-t border-card-border pt-12 mb-16 space-y-8">
+          <div className="flex items-center gap-2">
+            <Star className="text-amber-500 fill-amber-500" size={24} />
+            <h2 className="text-xl font-bold">Reviews ({product.reviews?.length || 0})</h2>
+          </div>
+
+          {/* List of Reviews */}
+          <div className="space-y-4">
+            {!product.reviews || product.reviews.length === 0 ? (
+              <p className="text-gray-500 text-center py-6 text-sm">
+                No reviews yet. Be the first to share your experience!
+              </p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {product.reviews.map((rev, index) => (
+                  <div key={index} className="p-5 rounded-2xl bg-gray-50 dark:bg-slate-900/30 border border-card-border space-y-2">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h4 className="font-bold text-sm text-gray-800 dark:text-gray-200">{rev.name}</h4>
+                        <div className="flex items-center gap-1 mt-1">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={i}
+                              size={12}
+                              className={i < rev.rating ? "text-amber-500 fill-amber-500" : "text-gray-300 dark:text-gray-700"}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                      <span className="text-[10px] text-gray-400 font-medium">
+                        {rev.createdAt ? new Date(rev.createdAt).toLocaleDateString() : "Recently"}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed pt-2">
+                      {rev.comment}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Post a Review Card */}
+          <div className="p-6 glass-panel rounded-3xl border border-card-border space-y-6 max-w-2xl">
+            <div>
+              <h3 className="text-base font-bold text-gray-800 dark:text-gray-200">Post an Experience Review</h3>
+              <p className="text-[10px] text-gray-400 font-medium">Share your feedback about this product with the community</p>
+            </div>
+
+            <form onSubmit={handleReviewSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase text-gray-400 mb-1">Your Name</label>
+                  <input
+                    type="text"
+                    required
+                    value={reviewName}
+                    onChange={(e) => setReviewName(e.target.value)}
+                    placeholder="e.g. Nabhan"
+                    className="w-full glass-input px-3.5 py-2.5 rounded-xl text-xs"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold uppercase text-gray-400 mb-1">Rating Score</label>
+                  <select
+                    value={reviewRating}
+                    onChange={(e) => setReviewRating(Number(e.target.value))}
+                    className="w-full bg-transparent border border-amber-500 rounded-xl text-xs p-2.5 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 cursor-pointer"
+                  >
+                    <option value={5} className="bg-white dark:bg-slate-900">5 Stars (Exceptional)</option>
+                    <option value={4} className="bg-white dark:bg-slate-900">4 Stars (Good)</option>
+                    <option value={3} className="bg-white dark:bg-slate-900">3 Stars (Average)</option>
+                    <option value={2} className="bg-white dark:bg-slate-900">2 Stars (Poor)</option>
+                    <option value={1} className="bg-white dark:bg-slate-900">1 Star (Terrible)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold uppercase text-gray-400 mb-1">Review Comment</label>
+                <textarea
+                  required
+                  rows={4}
+                  value={reviewComment}
+                  onChange={(e) => setReviewComment(e.target.value)}
+                  placeholder="Tell us what you liked or disliked about this product..."
+                  className="w-full glass-input px-3.5 py-2.5 rounded-xl text-xs min-h-[80px]"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={submittingReview}
+                className="px-6 py-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-amber-500/10 flex items-center gap-2 cursor-pointer"
+              >
+                <Send size={14} /> {submittingReview ? "Posting..." : "Post Review"}
+              </button>
+            </form>
           </div>
         </div>
 

@@ -219,9 +219,20 @@ export default function Explore() {
                         <img src={p.image} alt={p.title} className="w-full h-full object-cover" />
                         <button
                           onClick={() => toggleFavorite(pId)}
-                          className="absolute top-4 right-4 p-2 rounded-xl bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 shadow-md backdrop-blur-sm transition-all hover:scale-105"
+                          className={`absolute top-4 right-4 p-2 rounded-xl shadow-md backdrop-blur-sm transition-all duration-300 hover:scale-105 ${
+                            isFavorite(pId)
+                              ? "bg-[#180A18]/90 border border-transparent"
+                              : "bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800"
+                          }`}
                         >
-                          <Heart size={16} className={isFavorite(pId) ? "fill-rose-500 text-rose-500" : "text-slate-400 dark:text-gray-500"} />
+                          <Heart
+                            size={16}
+                            className={`transition-all duration-300 ${
+                              isFavorite(pId)
+                                ? "fill-[#FF2D55] text-[#FF2D55]"
+                                : "text-slate-400 dark:text-gray-500"
+                            }`}
+                          />
                         </button>
                       </div>
                       <div className="p-5 flex flex-col flex-1">
