@@ -284,7 +284,7 @@ export default function AdminDashboard() {
           {/* Admin Sidebar */}
           <div className="w-full lg:w-64 space-y-6">
             {/* Profile Card */}
-            <div className="bg-[#ffffff] dark:bg-slate-900 rounded-3xl p-6 border border-card-border text-center flex flex-col items-center shadow-sm">
+            <div className="bg-[#ffffff] dark:bg-slate-900 rounded-3xl p-6 border border-slate-800 dark:border-slate-700 text-center flex flex-col items-center shadow-sm">
               <div className="relative w-20 h-20 mb-3">
                 <img
                   src={user?.image || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=256&auto=format&fit=crop"}
@@ -300,7 +300,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Navigation Menu */}
-            <div className="bg-[#ffffff] dark:bg-slate-900 rounded-3xl p-5 border border-card-border space-y-1 shadow-sm">
+            <div className="bg-[#ffffff] dark:bg-slate-900 rounded-3xl p-5 border border-slate-800 dark:border-slate-700 space-y-1 shadow-sm">
               <div className="flex items-center gap-2 px-3 py-2 text-[10px] font-extrabold uppercase tracking-wider text-gray-400 mb-2 border-b border-card-border pb-3">
                 <Shield size={12} className="text-brand dark:text-gold" /> Admin Panel
               </div>
@@ -315,13 +315,6 @@ export default function AdminDashboard() {
               >
                 <Grid size={16} /> Overview
               </button>
-
-              <Link
-                href="/items/add"
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 transition-all border border-transparent"
-              >
-                <PlusCircle size={16} /> Add Listing
-              </Link>
 
               <button
                 onClick={() => setActiveTab("users")}
@@ -397,7 +390,7 @@ export default function AdminDashboard() {
         </div>
 
           {/* Content panel */}
-          <div className="flex-1 bg-[#ffffff] dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-card-border min-h-[450px] shadow-sm">
+          <div className="flex-1 bg-[#ffffff] dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-800 dark:border-slate-700 min-h-[450px] shadow-sm">
             
             {/* OVERVIEW PANEL */}
             {activeTab === "overview" && (
@@ -410,7 +403,7 @@ export default function AdminDashboard() {
                 {/* Scorecards */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {/* Total Users */}
-                  <div className="p-6 bg-[#ffffff] dark:bg-slate-900 rounded-3xl border border-card-border flex justify-between items-center shadow-sm">
+                  <div className="p-6 bg-[#ffffff] dark:bg-slate-900 rounded-3xl border border-slate-800 dark:border-slate-700 flex justify-between items-center shadow-sm">
                     <div className="space-y-1">
                       <span className="text-[10px] text-gray-400 font-extrabold uppercase tracking-wider block">Total Users</span>
                       <span className="text-3xl font-black block">{stats.userCount}</span>
@@ -424,7 +417,7 @@ export default function AdminDashboard() {
                   </div>
 
                   {/* Total Products (Stays) */}
-                  <div className="p-6 bg-[#ffffff] dark:bg-slate-900 rounded-3xl border border-card-border flex justify-between items-center shadow-sm">
+                  <div className="p-6 bg-[#ffffff] dark:bg-slate-900 rounded-3xl border border-slate-800 dark:border-slate-700 flex justify-between items-center shadow-sm">
                     <div className="space-y-1">
                       <span className="text-[10px] text-gray-400 font-extrabold uppercase tracking-wider block">Total Stays</span>
                       <span className="text-3xl font-black block">{stats.productCount}</span>
@@ -438,7 +431,7 @@ export default function AdminDashboard() {
                   </div>
 
                   {/* Transactions */}
-                  <div className="p-6 bg-[#ffffff] dark:bg-slate-900 rounded-3xl border border-card-border flex justify-between items-center shadow-sm">
+                  <div className="p-6 bg-[#ffffff] dark:bg-slate-900 rounded-3xl border border-slate-800 dark:border-slate-700 flex justify-between items-center shadow-sm">
                     <div className="space-y-1">
                       <span className="text-[10px] text-gray-400 font-extrabold uppercase tracking-wider block">Transactions</span>
                       <span className="text-3xl font-black block">{orders.length}</span>
@@ -452,7 +445,7 @@ export default function AdminDashboard() {
                   </div>
 
                   {/* Inquiries */}
-                  <div className="p-6 bg-[#ffffff] dark:bg-slate-900 rounded-3xl border border-card-border flex justify-between items-center shadow-sm">
+                  <div className="p-6 bg-[#ffffff] dark:bg-slate-900 rounded-3xl border border-slate-800 dark:border-slate-700 flex justify-between items-center shadow-sm">
                     <div className="space-y-1">
                       <span className="text-[10px] text-gray-400 font-extrabold uppercase tracking-wider block">Inquiries</span>
                       <span className="text-3xl font-black block">{inquiries.length}</span>
@@ -466,7 +459,7 @@ export default function AdminDashboard() {
                   </div>
 
                   {/* Subscribers */}
-                  <div className="p-6 bg-[#ffffff] dark:bg-slate-900 rounded-3xl border border-card-border flex justify-between items-center shadow-sm">
+                  <div className="p-6 bg-[#ffffff] dark:bg-slate-900 rounded-3xl border border-slate-800 dark:border-slate-700 flex justify-between items-center shadow-sm">
                     <div className="space-y-1">
                       <span className="text-[10px] text-gray-400 font-extrabold uppercase tracking-wider block">Subscribers</span>
                       <span className="text-3xl font-black block">{subscribers.length}</span>
@@ -477,19 +470,6 @@ export default function AdminDashboard() {
                     <div className="w-12 h-12 rounded-2xl bg-yellow-50 dark:bg-yellow-950/20 flex items-center justify-center text-yellow-500">
                       <Sparkles size={22} />
                     </div>
-                  </div>
-                </div>
-
-                {/* System Admin Center block */}
-                <div className="p-6 bg-[#fef8ec] dark:bg-slate-900/30 border border-[#fbd38d]/40 dark:border-slate-800 rounded-3xl flex items-start gap-4 shadow-sm">
-                  <div className="p-2.5 bg-amber-500 text-[#ffffff] rounded-2xl mt-0.5">
-                    <Sparkles size={20} />
-                  </div>
-                  <div>
-                    <h4 className="font-extrabold text-sm text-[#744210] dark:text-gold flex items-center gap-1">System Administrator Center</h4>
-                    <p className="text-xs text-[#9c4221] dark:text-gray-400 mt-1 leading-relaxed">
-                      Manage property inventory, authorize features, review transactions, and block/unblock system credentials.
-                    </p>
                   </div>
                 </div>
               </div>
