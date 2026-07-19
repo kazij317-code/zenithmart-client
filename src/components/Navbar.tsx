@@ -5,14 +5,16 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useApp } from "@/context/AppContext";
-import { ShoppingCart, Heart, Menu, X, Sun, Moon, LogOut, User as UserIcon } from "lucide-react";
+import { ShoppingCart, Heart, Menu, X, Sun, Moon, LogOut, User as UserIcon, Users, ChevronDown } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 export default function Navbar() {
-  const { user, logout } = useAuth();
+  const { user, logout, login } = useAuth();
   const { cart, favorites } = useApp();
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [isDark, setIsDark] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   useEffect(() => {
     // Check local storage or document class for dark mode
@@ -136,8 +138,11 @@ export default function Navbar() {
 
             {/* User Profile / Logout */}
             {user ? (
-              <div className="flex items-center space-x-3 pl-2 border-l border-gray-200 dark:border-gray-800">
-                <div className="flex items-center gap-2">
+              <div className="relative flex items-center space-x-3 pl-2 border-l border-gray-200 dark:border-gray-800">
+                <button
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                  className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity focus:outline-none"
+                >
                   <div className="w-8 h-8 rounded-full bg-brand/20 dark:bg-gold/20 flex items-center justify-center text-brand dark:text-gold border border-brand/15">
                     {user.image ? (
                       <img src={user.image} alt={user.name} className="w-8 h-8 rounded-full object-cover" />
@@ -146,14 +151,67 @@ export default function Navbar() {
                     )}
                   </div>
                   <span className="text-xs font-semibold max-w-[100px] truncate text-gray-700 dark:text-gray-200">{user.name}</span>
-                </div>
-                <button
-                  onClick={logout}
-                  className="p-2 rounded-full hover:bg-red-50 dark:hover:bg-red-950/20 text-red-500 transition-colors"
-                  title="Logout"
-                >
-                  <LogOut size={18} />
+                  <ChevronDown size={14} className="text-gray-500 transition-transform duration-200" style={{ transform: isDropdownOpen ? 'rotate(180deg)' : 'none' }} />
                 </button>
+
+                {isDropdownOpen && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setIsDropdownOpen(false)} />
+                    <div className="absolute right-0 top-10 mt-2 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl py-3 z-50 animate-in fade-in slide-in-from-top-2 duration-150 text-left">
+                      <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-800 mb-2">
+                        <div className="text-xs font-bold text-gray-800 dark:text-gray-200">Welcome back!</div>
+                        <div className="text-[10px] text-gray-500 truncate mt-0.5">{user.email}</div>
+                      </div>
+
+                      <button
+                        onClick={async () => {
+                          setIsDropdownOpen(false);
+                          const res = await login("jams@yahoo.com", "Nabhan@123");
+                          if (res.success) {
+                            toast.success("Logged in as Demo User");
+                            window.location.reload();
+                          } else {
+                            toast.error(res.error || "Failed to switch to Demo User");
+                          }
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors text-left bg-transparent border-none cursor-pointer"
+                      >
+                        <UserIcon size={16} className="text-gray-400" />
+                        DEMO USER
+                      </button>
+
+                      <button
+                        onClick={async () => {
+                          setIsDropdownOpen(false);
+                          const res = await login("admin@admin.com", "Admin@123");
+                          if (res.success) {
+                            toast.success("Logged in as Demo Admin");
+                            window.location.reload();
+                          } else {
+                            toast.error(res.error || "Failed to switch to Demo Admin");
+                          }
+                        }}
+                        className="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 transition-colors text-left bg-transparent border-none cursor-pointer"
+                      >
+                        <Users size={16} className="text-gray-400" />
+                        DEMO ADMIN
+                      </button>
+
+                      <div className="border-t border-slate-100 dark:border-slate-800 mt-2 pt-2">
+                        <button
+                          onClick={() => {
+                            setIsDropdownOpen(false);
+                            logout();
+                          }}
+                          className="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-semibold text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors text-left bg-transparent border-none cursor-pointer"
+                        >
+                          <LogOut size={16} />
+                          Logout
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             ) : (
               <div className="flex items-center space-x-3 pl-2 border-l border-gray-200 dark:border-gray-800">
