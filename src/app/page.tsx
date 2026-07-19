@@ -343,34 +343,44 @@ export default function Home() {
         </section>
 
         {/* Section 6: Testimonials */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-extrabold tracking-tight">What Our Shoppers Say</h2>
             <p className="mt-4 text-gray-500 dark:text-gray-400 max-w-xl mx-auto">
               Real opinions from real members of the Zenith community.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              { name: "Sophia Reynolds", role: "Design Director", text: "ZenithMart is my absolute favorite store. The minimalist leather backpack is a masterpiece, and ZenithBot recommended headphones that fit my travel schedule perfectly!", rating: 5 },
-              { name: "Marcus Chen", role: "Software Engineer", text: "The ergonomic office chair is incredibly comfortable, and setup was simple. The shopping experience was streamlined by the AI assistant chat which detailed the specs accurately.", rating: 5 },
-              { name: "Emily Watson", role: "Yoga Instructor", text: "I bought the cork yoga mat. The laser alignment marks are super helpful. The secure cash on delivery payment went smoothly. Highly recommend ZenithMart!", rating: 4 }
-            ].map((t, idx) => (
-              <div key={idx} className="p-8 glass-card rounded-2xl border border-card-border flex flex-col justify-between">
-                <div>
-                  <div className="flex gap-1 mb-4 text-gold">
-                    {Array.from({ length: t.rating }).map((_, i) => (
-                      <Star key={i} size={16} fill="currentColor" />
-                    ))}
+          
+          <div className="relative w-full overflow-hidden py-4">
+            {/* Smooth Fade Edge Gradients */}
+            <div className="absolute inset-y-0 left-0 w-16 md:w-32 bg-gradient-to-r from-[#F8FAFC] dark:from-[#0B0F19] to-transparent z-10 pointer-events-none" />
+            <div className="absolute inset-y-0 right-0 w-16 md:w-32 bg-gradient-to-l from-[#F8FAFC] dark:from-[#0B0F19] to-transparent z-10 pointer-events-none" />
+            
+            <div className="animate-marquee flex gap-8">
+              {[
+                { name: "Sophia Reynolds", role: "Design Director", text: "ZenithMart is my absolute favorite store. The minimalist leather backpack is a masterpiece, and ZenithBot recommended headphones that fit my travel schedule perfectly!", rating: 5 },
+                { name: "Marcus Chen", role: "Software Engineer", text: "The ergonomic office chair is incredibly comfortable, and setup was simple. The shopping experience was streamlined by the AI assistant chat which detailed the specs accurately.", rating: 5 },
+                { name: "Emily Watson", role: "Yoga Instructor", text: "I bought the cork yoga mat. The laser alignment marks are super helpful. The secure cash on delivery payment went smoothly. Highly recommend ZenithMart!", rating: 4 },
+                { name: "Sophia Reynolds", role: "Design Director", text: "ZenithMart is my absolute favorite store. The minimalist leather backpack is a masterpiece, and ZenithBot recommended headphones that fit my travel schedule perfectly!", rating: 5 },
+                { name: "Marcus Chen", role: "Software Engineer", text: "The ergonomic office chair is incredibly comfortable, and setup was simple. The shopping experience was streamlined by the AI assistant chat which detailed the specs accurately.", rating: 5 },
+                { name: "Emily Watson", role: "Yoga Instructor", text: "I bought the cork yoga mat. The laser alignment marks are super helpful. The secure cash on delivery payment went smoothly. Highly recommend ZenithMart!", rating: 4 }
+              ].map((t, idx) => (
+                <div key={idx} className="w-[350px] flex-shrink-0 p-8 glass-card rounded-2xl border border-card-border flex flex-col justify-between">
+                  <div>
+                    <div className="flex gap-1 mb-4 text-gold">
+                      {Array.from({ length: t.rating }).map((_, i) => (
+                        <Star key={i} size={16} fill="currentColor" />
+                      ))}
+                    </div>
+                    <p className="text-sm italic text-gray-600 dark:text-gray-300 leading-relaxed mb-6">"{t.text}"</p>
                   </div>
-                  <p className="text-sm italic text-gray-600 dark:text-gray-300 leading-relaxed mb-6">"{t.text}"</p>
+                  <div>
+                    <div className="font-bold text-sm">{t.name}</div>
+                    <div className="text-xs text-gray-400">{t.role}</div>
+                  </div>
                 </div>
-                <div>
-                  <div className="font-bold text-sm">{t.name}</div>
-                  <div className="text-xs text-gray-400">{t.role}</div>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </section>
 
