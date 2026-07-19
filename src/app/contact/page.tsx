@@ -109,7 +109,7 @@ export default function Contact() {
                 </div>
                 <h3 className="text-xl font-extrabold mb-3 text-slate-800 dark:text-white">Inquiry Received</h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md leading-relaxed mb-8">
-                  Thank you for connecting. A dedicated luxury concierge has been assigned to your query and will reach out to you within 2 hours.
+                  Thank you for connecting. A dedicated product specialist has been assigned to your query and will reach out to you within 2 hours.
                 </p>
                 <button
                   onClick={() => setSubmitted(false)}
