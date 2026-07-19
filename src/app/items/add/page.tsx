@@ -70,23 +70,79 @@ export default function AddItem() {
 
   const parseAIData = (text: string) => {
     if (!text) return;
-    
+
     const lines = text.split("\n");
+    let currentField = "";
+    
+    let tempTitle = "";
+    let tempPrice = "";
+    let tempCategory = "Electronics";
+    let tempStock = "10";
+    let tempShortDesc = "";
+    let tempFullDesc = "";
+    let tempImages: string[] = [];
     const parsedSpecs: { key: string; value: string }[] = [];
-    let isParsingSpecs = false;
 
     lines.forEach((line) => {
       const cleanLine = line.trim();
       if (!cleanLine) return;
 
-      // Detect start of specifications block
-      if (cleanLine.toLowerCase().startsWith("specifications:") || cleanLine.toLowerCase().startsWith("specs:")) {
-        isParsingSpecs = true;
+      const lowerLine = cleanLine.toLowerCase();
+      
+      // Check for standalone header tags
+      if (lowerLine === "short description:" || lowerLine === "short desc:" || lowerLine === "summary:") {
+        currentField = "short_desc";
+        return;
+      }
+      if (lowerLine === "full description:" || lowerLine === "description:" || lowerLine === "details:" || lowerLine === "full specifications description:") {
+        currentField = "full_desc";
+        return;
+      }
+      if (lowerLine === "images:" || lowerLine === "image url:" || lowerLine === "image urls:") {
+        currentField = "images";
+        return;
+      }
+      if (lowerLine === "specifications:" || lowerLine === "specs:") {
+        currentField = "specifications";
         return;
       }
 
-      // If parsing specifications, try to split by colon
-      if (isParsingSpecs) {
+      // Check inline fields
+      if (lowerLine.startsWith("title:") || lowerLine.startsWith("name:") || lowerLine.startsWith("product title:")) {
+        currentField = "";
+        const val = cleanLine.substring(cleanLine.indexOf(":") + 1).trim();
+        if (val) tempTitle = val;
+        return;
+      }
+      if (lowerLine.startsWith("price:") || lowerLine.startsWith("cost:")) {
+        currentField = "";
+        const val = cleanLine.substring(cleanLine.indexOf(":") + 1).trim();
+        if (val) tempPrice = val.replace(/[^0-9.]/g, "");
+        return;
+      }
+      if (lowerLine.startsWith("category:")) {
+        currentField = "";
+        const val = cleanLine.substring(cleanLine.indexOf(":") + 1).trim();
+        if (val) tempCategory = val;
+        return;
+      }
+      if (lowerLine.startsWith("stock:") || lowerLine.startsWith("quantity:") || lowerLine.startsWith("count:")) {
+        currentField = "";
+        const val = cleanLine.substring(cleanLine.indexOf(":") + 1).trim();
+        if (val) tempStock = val.replace(/\D/g, "");
+        return;
+      }
+
+      // If we are currently reading content for a multi-line field
+      if (currentField === "short_desc") {
+        tempShortDesc = tempShortDesc ? tempShortDesc + "\n" + cleanLine : cleanLine;
+      } else if (currentField === "full_desc") {
+        tempFullDesc = tempFullDesc ? tempFullDesc + "\n" + cleanLine : cleanLine;
+      } else if (currentField === "images") {
+        if (cleanLine.startsWith("http")) {
+          tempImages.push(cleanLine);
+        }
+      } else if (currentField === "specifications") {
         const colonIdx = cleanLine.indexOf(":");
         if (colonIdx > 0) {
           const key = cleanLine.substring(0, colonIdx).trim().replace(/^[-*•\s]+/, "");
@@ -95,46 +151,52 @@ export default function AddItem() {
             parsedSpecs.push({ key, value });
           }
         }
-        return;
-      }
+      } else {
+        // Single-line fallback
+        const colonIdx = cleanLine.indexOf(":");
+        if (colonIdx > 0) {
+          const field = cleanLine.substring(0, colonIdx).toLowerCase().trim();
+          const value = cleanLine.substring(colonIdx + 1).trim();
 
-      // Check standard fields
-      const colonIdx = cleanLine.indexOf(":");
-      if (colonIdx > 0) {
-        const field = cleanLine.substring(0, colonIdx).toLowerCase().trim();
-        const value = cleanLine.substring(colonIdx + 1).trim();
-
-        if (field === "title" || field === "name" || field === "product title") {
-          setTitle(value);
-        } else if (field === "price" || field === "cost") {
-          setPrice(value.replace(/[^0-9.]/g, ""));
-        } else if (field === "short description" || field === "short desc" || field === "summary") {
-          setShortDescription(value);
-        } else if (field === "full description" || field === "description" || field === "details") {
-          setFullDescription(value);
-        } else if (field === "category") {
-          const cat = value.toLowerCase();
-          if (cat.includes("electronic")) setCategory("Electronics");
-          else if (cat.includes("fashion") || cat.includes("apparel")) setCategory("Fashion");
-          else if (cat.includes("home") || cat.includes("living")) setCategory("Home & Living");
-          else if (cat.includes("fit") || cat.includes("outdoor") || cat.includes("sport")) setCategory("Fitness & Outdoor");
-          else setCategory("Electronics");
-        } else if (field === "stock" || field === "quantity" || field === "count") {
-          setStock(value.replace(/\D/g, ""));
-        } else if (field === "image" || field === "image url" || field === "main image") {
-          setImage(value);
-        } else if (field === "image2" || field === "image 2") {
-          setImage2(value);
-        } else if (field === "image3" || field === "image 3") {
-          setImage3(value);
+          if (field === "short description" || field === "short desc" || field === "summary") {
+            tempShortDesc = value;
+          } else if (field === "full description" || field === "description" || field === "details" || field === "full specifications description") {
+            tempFullDesc = value;
+          } else if (field === "image" || field === "image url" || field === "main image" || field === "main image url") {
+            tempImages.push(value);
+          }
         }
       }
     });
 
+    if (tempTitle) setTitle(tempTitle);
+    if (tempPrice) setPrice(tempPrice);
+    if (tempCategory) {
+      const cat = tempCategory.toLowerCase();
+      if (cat.includes("computers") || cat.includes("electronic") || cat.includes("laptop")) {
+        setCategory("Electronics");
+      } else if (cat.includes("fashion") || cat.includes("apparel")) {
+        setCategory("Fashion");
+      } else if (cat.includes("home") || cat.includes("living")) {
+        setCategory("Home & Living");
+      } else if (cat.includes("fit") || cat.includes("outdoor") || cat.includes("sport")) {
+        setCategory("Fitness & Outdoor");
+      }
+    }
+    if (tempStock) setStock(tempStock);
+    if (tempShortDesc) setShortDescription(tempShortDesc);
+    if (tempFullDesc) setFullDescription(tempFullDesc);
+    
+    if (tempImages.length > 0) {
+      setImage(tempImages[0] || "");
+      setImage2(tempImages[1] || "");
+      setImage3(tempImages[2] || "");
+    }
     if (parsedSpecs.length > 0) {
       setSpecs(parsedSpecs);
     }
-    toast.success("AI Data parsed and populated!");
+
+    toast.success("AI Data parsed and populated successfully!");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
