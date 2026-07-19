@@ -8,6 +8,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Package, Tag, DollarSign, List, FileText, Image, Plus, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { toast } from "react-hot-toast";
 
 export default function AddItem() {
   const { user } = useAuth();
@@ -65,6 +66,75 @@ export default function AddItem() {
       { key: "Connectivity", value: "Wi-Fi 7 & Bluetooth 5.4" },
       { key: "Battery Life", value: "Up to 3 Hours Active Use" }
     ]);
+  };
+
+  const parseAIData = (text: string) => {
+    if (!text) return;
+    
+    const lines = text.split("\n");
+    const parsedSpecs: { key: string; value: string }[] = [];
+    let isParsingSpecs = false;
+
+    lines.forEach((line) => {
+      const cleanLine = line.trim();
+      if (!cleanLine) return;
+
+      // Detect start of specifications block
+      if (cleanLine.toLowerCase().startsWith("specifications:") || cleanLine.toLowerCase().startsWith("specs:")) {
+        isParsingSpecs = true;
+        return;
+      }
+
+      // If parsing specifications, try to split by colon
+      if (isParsingSpecs) {
+        const colonIdx = cleanLine.indexOf(":");
+        if (colonIdx > 0) {
+          const key = cleanLine.substring(0, colonIdx).trim().replace(/^[-*•\s]+/, "");
+          const value = cleanLine.substring(colonIdx + 1).trim();
+          if (key && value) {
+            parsedSpecs.push({ key, value });
+          }
+        }
+        return;
+      }
+
+      // Check standard fields
+      const colonIdx = cleanLine.indexOf(":");
+      if (colonIdx > 0) {
+        const field = cleanLine.substring(0, colonIdx).toLowerCase().trim();
+        const value = cleanLine.substring(colonIdx + 1).trim();
+
+        if (field === "title" || field === "name" || field === "product title") {
+          setTitle(value);
+        } else if (field === "price" || field === "cost") {
+          setPrice(value.replace(/[^0-9.]/g, ""));
+        } else if (field === "short description" || field === "short desc" || field === "summary") {
+          setShortDescription(value);
+        } else if (field === "full description" || field === "description" || field === "details") {
+          setFullDescription(value);
+        } else if (field === "category") {
+          const cat = value.toLowerCase();
+          if (cat.includes("electronic")) setCategory("Electronics");
+          else if (cat.includes("fashion") || cat.includes("apparel")) setCategory("Fashion");
+          else if (cat.includes("home") || cat.includes("living")) setCategory("Home & Living");
+          else if (cat.includes("fit") || cat.includes("outdoor") || cat.includes("sport")) setCategory("Fitness & Outdoor");
+          else setCategory("Electronics");
+        } else if (field === "stock" || field === "quantity" || field === "count") {
+          setStock(value.replace(/\D/g, ""));
+        } else if (field === "image" || field === "image url" || field === "main image") {
+          setImage(value);
+        } else if (field === "image2" || field === "image 2") {
+          setImage2(value);
+        } else if (field === "image3" || field === "image 3") {
+          setImage3(value);
+        }
+      }
+    });
+
+    if (parsedSpecs.length > 0) {
+      setSpecs(parsedSpecs);
+    }
+    toast.success("AI Data parsed and populated!");
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -148,6 +218,22 @@ export default function AddItem() {
           >
             ⚡ Autofill Demo Product
           </button>
+        </div>
+
+        {/* Smart Paste Input */}
+        <div className="mb-8 p-5 glass-panel rounded-2xl border border-dashed border-indigo-500/30 space-y-3">
+          <div className="flex justify-between items-center">
+            <div>
+              <h4 className="font-bold text-xs text-indigo-700 dark:text-indigo-400">Smart AI Data Importer</h4>
+              <p className="text-[10px] text-gray-400">Paste your raw AI-generated product specifications text here to automatically fill the form.</p>
+            </div>
+            <span className="text-[10px] bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 px-2 py-0.5 rounded-full font-bold uppercase">AI Smart Fill</span>
+          </div>
+          <textarea
+            onChange={(e) => parseAIData(e.target.value)}
+            placeholder="Paste raw text here. Example:&#10;Title: Zenith Smart Watch&#10;Price: $299&#10;Category: Electronics&#10;Description: Next-gen smartwatch...&#10;Specifications:&#10;- Display: 1.4 inch AMOLED&#10;- Battery: 7 Days"
+            className="w-full glass-input p-3.5 rounded-xl text-xs min-h-[100px] font-mono focus:outline-none"
+          />
         </div>
 
         <form onSubmit={handleSubmit} className="glass-panel p-6 sm:p-8 rounded-2xl border border-card-border space-y-6">
