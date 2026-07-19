@@ -169,7 +169,7 @@ export default function Navbar() {
                           const res = await login("jams@yahoo.com", "Nabhan@123");
                           if (res.success) {
                             toast.success("Logged in as Demo User");
-                            window.location.reload();
+                            window.location.href = "/dashboard/user";
                           } else {
                             toast.error(res.error || "Failed to switch to Demo User");
                           }
@@ -179,14 +179,14 @@ export default function Navbar() {
                         <UserIcon size={16} className="text-gray-400" />
                         DEMO USER
                       </button>
-
+ 
                       <button
                         onClick={async () => {
                           setIsDropdownOpen(false);
                           const res = await login("admin@admin.com", "Admin@123");
                           if (res.success) {
                             toast.success("Logged in as Demo Admin");
-                            window.location.reload();
+                            window.location.href = "/dashboard/admin";
                           } else {
                             toast.error(res.error || "Failed to switch to Demo Admin");
                           }

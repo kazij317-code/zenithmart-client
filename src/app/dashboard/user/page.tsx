@@ -52,8 +52,11 @@ function UserDashboardContent() {
     if (user) {
       setUpdateName(user.name || "");
       setUpdateImage(user.image || "");
+      if (user.role === "admin") {
+        router.push("/dashboard/admin");
+      }
     }
-  }, [user]);
+  }, [user, router]);
 
   const handleUpdateProfileSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
