@@ -45,6 +45,28 @@ export default function AddItem() {
 
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:5000";
 
+  const handleAutofill = () => {
+    setTitle("Zenith Pro VR Headset");
+    setShortDescription("Aerospace-grade standalone VR headset with 8K Micro-OLED display.");
+    setFullDescription("Experience ultra-realistic virtual reality with the Zenith Pro standalone VR headset. Featuring dual 4K Micro-OLED panels, Snapdragon XR2+ Gen 2 chipset, spatial audio, and hand/eye tracking capabilities.");
+    setPrice("899");
+    setCategory("Electronics");
+    setStock("25");
+    setImage("https://images.unsplash.com/photo-1593508512255-86ab42a8e620?q=80&w=400&auto=format&fit=crop");
+    setImage2("https://images.unsplash.com/photo-1592478411213-6153e4ebc07d?q=80&w=400&auto=format&fit=crop");
+    setImage3("");
+    setSpecs([
+      { key: "Display", value: "Dual 4K Micro-OLED AR/VR Display" },
+      { key: "Processor", value: "Snapdragon XR2+ Gen 2" },
+      { key: "Memory", value: "12GB LPDDR5X RAM" },
+      { key: "Storage", value: "256GB Standalone Storage" },
+      { key: "Tracking", value: "6 DoF Inside-Out Camera Tracking" },
+      { key: "Audio", value: "Spatial Sound Speakers" },
+      { key: "Connectivity", value: "Wi-Fi 7 & Bluetooth 5.4" },
+      { key: "Battery Life", value: "Up to 3 Hours Active Use" }
+    ]);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title || !shortDescription || !fullDescription || !price || !image) {
@@ -111,12 +133,21 @@ export default function AddItem() {
       <Navbar />
 
       <main className="flex-grow max-w-3xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="mb-8">
-          <Link href="/dashboard/admin" className="text-xs font-bold text-gray-500 hover:text-brand flex items-center gap-1">
-            <ArrowLeft size={14} /> Back to Dashboard
-          </Link>
-          <h1 className="text-3xl font-extrabold tracking-tight mt-4">Add New Product</h1>
-          <p className="text-xs text-gray-500 mt-1">Publish a premium new innovation to the ZenithMart catalog.</p>
+        <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <Link href="/dashboard/admin" className="text-xs font-bold text-gray-500 hover:text-brand flex items-center gap-1">
+              <ArrowLeft size={14} /> Back to Dashboard
+            </Link>
+            <h1 className="text-3xl font-extrabold tracking-tight mt-4">Add New Product</h1>
+            <p className="text-xs text-gray-500 mt-1">Publish a premium new innovation to the ZenithMart catalog.</p>
+          </div>
+          <button
+            type="button"
+            onClick={handleAutofill}
+            className="px-4 py-2.5 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/20 rounded-xl text-xs font-bold transition-all cursor-pointer border border-indigo-500/20"
+          >
+            ⚡ Autofill Demo Product
+          </button>
         </div>
 
         <form onSubmit={handleSubmit} className="glass-panel p-6 sm:p-8 rounded-2xl border border-card-border space-y-6">
