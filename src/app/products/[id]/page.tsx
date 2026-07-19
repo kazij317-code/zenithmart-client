@@ -8,6 +8,7 @@ import { useApp } from "@/context/AppContext";
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
 import { Heart, ShoppingCart, Star, Sparkles, ShieldCheck, Check, Send } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 interface Review {
   name: string;
@@ -78,6 +79,11 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
 
   const handleReviewSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) {
+      toast.error("You must be logged in to leave a rating and review");
+      alert("You must be logged in to leave a rating and review");
+      return;
+    }
     if (!reviewName || !reviewComment) {
       alert("Please fill in all fields.");
       return;
