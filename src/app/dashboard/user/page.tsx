@@ -418,7 +418,7 @@ function UserDashboardContent() {
                             return (
                               <tr key={`${order._id}-${i}`} className="hover:bg-gray-50/50 dark:hover:bg-slate-900/10">
                                 <td className="p-4 font-mono font-bold text-gray-700 dark:text-gray-300">
-                                  {i === 0 ? orderId : ""}
+                                  {orderId}
                                 </td>
                                 <td className="p-4 flex items-center gap-3">
                                   <img src={item.image} alt={item.title} className="w-9 h-9 rounded object-cover flex-shrink-0" />
@@ -427,21 +427,19 @@ function UserDashboardContent() {
                                 <td className="p-4 text-gray-500 font-medium">{item.quantity}</td>
                                 <td className="p-4 text-gray-500 font-medium">${item.price}</td>
                                 <td className="p-4 text-gray-500 font-medium">
-                                  {i === 0 ? orderDate : ""}
+                                  {orderDate}
                                 </td>
                                 <td className="p-4 font-bold text-gray-800 dark:text-gray-200">
-                                  {i === 0 ? `$${order.totalAmount}` : ""}
+                                  ${order.totalAmount}
                                 </td>
                                 <td className="p-4">
-                                  {i === 0 ? (
-                                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
-                                      order.status === "Confirmed"
-                                        ? "bg-emerald-100 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400"
-                                        : "bg-amber-100 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400"
-                                    }`}>
-                                      {order.status || "Pending"}
-                                    </span>
-                                  ) : ""}
+                                  <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
+                                    order.status === "Confirmed"
+                                      ? "bg-emerald-100 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400"
+                                      : "bg-amber-100 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400"
+                                  }`}>
+                                    {order.status || "Pending"}
+                                  </span>
                                 </td>
                               </tr>
                             );
