@@ -5,7 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AIChatBot from "@/components/AIChatBot";
 import { useAuth } from "@/context/AuthContext";
-import { Plus, Users, DollarSign, Package, ShoppingCart, Ban, ShieldCheck, Trash2, Mail, Sparkles, LogOut, Edit, Eye, X, CreditCard, Shield, Grid, PlusCircle, Compass, User } from "lucide-react";
+import { Plus, Users, DollarSign, Package, ShoppingCart, Ban, ShieldCheck, Trash2, Mail, Sparkles, LogOut, Edit, Eye, X, CreditCard, Shield, Grid, PlusCircle, Compass, User, Tag, List, FileText, Image } from "lucide-react";
 import Link from "next/link";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 
@@ -24,6 +24,8 @@ interface Product {
   category: string;
   stock: number;
   image: string;
+  images?: string[];
+  specifications?: Record<string, string>;
   shortDescription?: string;
   fullDescription?: string;
 }
@@ -56,9 +58,12 @@ export default function AdminDashboard() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [editTitle, setEditTitle] = useState("");
   const [editPrice, setEditPrice] = useState("");
-  const [editCategory, setEditCategory] = useState("");
+  const [editCategory, setEditCategory] = useState("Electronics");
   const [editStock, setEditStock] = useState("");
   const [editImage, setEditImage] = useState("");
+  const [editImage2, setEditImage2] = useState("");
+  const [editImage3, setEditImage3] = useState("");
+  const [editSpecs, setEditSpecs] = useState<{ key: string; value: string }[]>([]);
   const [editShortDesc, setEditShortDesc] = useState("");
   const [editFullDesc, setEditFullDesc] = useState("");
 
@@ -208,6 +213,30 @@ export default function AdminDashboard() {
     setEditCategory(p.category);
     setEditStock(String(p.stock));
     setEditImage(p.image);
+    setEditImage2(p.images?.[0] || "");
+    setEditImage3(p.images?.[1] || "");
+
+    const specsArray = p.specifications && Object.keys(p.specifications).length > 0
+      ? Object.entries(p.specifications).map(([key, value]) => ({ key, value }))
+      : [
+          { key: "Display", value: "" },
+          { key: "AI Processor", value: "" },
+          { key: "Connectivity", value: "" },
+          { key: "Camera", value: "" },
+          { key: "Battery Life", value: "" },
+          { key: "Charging", value: "" },
+          { key: "Audio", value: "" },
+          { key: "Microphone", value: "" },
+          { key: "Water Resistance", value: "" },
+          { key: "Frame Material", value: "" },
+          { key: "Weight", value: "" },
+          { key: "Compatibility", value: "" },
+          { key: "Voice Assistant", value: "" },
+          { key: "Color", value: "" },
+          { key: "Warranty", value: "" }
+        ];
+    setEditSpecs(specsArray);
+
     setEditShortDesc(p.shortDescription || "");
     setEditFullDesc(p.fullDescription || "");
     setIsEditModalOpen(true);
@@ -217,6 +246,14 @@ export default function AdminDashboard() {
     e.preventDefault();
     if (!editingProduct) return;
     const token = localStorage.getItem("better-auth.session_token") || "";
+
+    const specifications: Record<string, string> = {};
+    editSpecs.forEach((item) => {
+      if (item.key && item.value) {
+        specifications[item.key] = item.value;
+      }
+    });
+
     try {
       const res = await fetch(`${BASE_URL}/api/products/${editingProduct._id || editingProduct.id}`, {
         method: "PUT",
@@ -230,6 +267,8 @@ export default function AdminDashboard() {
           category: editCategory,
           stock: Number(editStock),
           image: editImage,
+          images: [editImage2, editImage3].filter(Boolean),
+          specifications,
           shortDescription: editShortDesc,
           fullDescription: editFullDesc
         })
@@ -807,7 +846,7 @@ export default function AdminDashboard() {
       {/* Edit Product Modal */}
       {isEditModalOpen && editingProduct && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/55 backdrop-blur-sm">
-          <div className="w-full max-w-lg p-6 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-card-border max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
+          <div className="w-full max-w-3xl p-6 bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-card-border max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
             <div className="flex justify-between items-center mb-6 pb-3 border-b border-card-border">
               <h3 className="text-base font-bold text-gray-800 dark:text-gray-200 flex items-center gap-2">
                 <Edit size={18} className="text-amber-500" /> Edit Product Catalog
@@ -823,82 +862,207 @@ export default function AdminDashboard() {
               </button>
             </div>
 
-            <form onSubmit={handleEditSubmit} className="space-y-4">
-              <div>
-                <label className="block text-[10px] font-bold uppercase text-gray-400 mb-1">Product Title</label>
-                <input
-                  type="text"
-                  value={editTitle}
-                  onChange={(e) => setEditTitle(e.target.value)}
-                  className="w-full glass-input px-3.5 py-2 rounded-xl text-xs"
-                  required
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[10px] font-bold uppercase text-gray-400 mb-1">Price ($)</label>
-                  <input
-                    type="number"
-                    value={editPrice}
-                    onChange={(e) => setEditPrice(e.target.value)}
-                    className="w-full glass-input px-3.5 py-2 rounded-xl text-xs"
-                    required
-                  />
+            <form onSubmit={handleEditSubmit} className="space-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                
+                {/* Product Title */}
+                <div className="sm:col-span-2">
+                  <label className="text-[10px] font-bold uppercase text-gray-400 block mb-1">Product Title *</label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      required
+                      value={editTitle}
+                      onChange={(e) => setEditTitle(e.target.value)}
+                      placeholder="e.g. Zenith Noise-Cancelling Headphones"
+                      className="w-full glass-input pl-10 pr-4 py-2.5 rounded-xl text-sm"
+                    />
+                    <Tag size={16} className="absolute left-3.5 top-3.5 text-gray-400" />
+                  </div>
                 </div>
+
+                {/* Price */}
                 <div>
-                  <label className="block text-[10px] font-bold uppercase text-gray-400 mb-1">Stock Count</label>
-                  <input
-                    type="number"
-                    value={editStock}
-                    onChange={(e) => setEditStock(e.target.value)}
-                    className="w-full glass-input px-3.5 py-2 rounded-xl text-xs"
-                    required
-                  />
+                  <label className="text-[10px] font-bold uppercase text-gray-400 block mb-1">Price ($) *</label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      required
+                      value={editPrice}
+                      onChange={(e) => setEditPrice(e.target.value)}
+                      placeholder="299"
+                      className="w-full glass-input pl-10 pr-4 py-2.5 rounded-xl text-sm"
+                    />
+                    <DollarSign size={16} className="absolute left-3.5 top-3.5 text-gray-400" />
+                  </div>
                 </div>
-              </div>
 
-              <div>
-                <label className="block text-[10px] font-bold uppercase text-gray-400 mb-1">Category</label>
-                <input
-                  type="text"
-                  value={editCategory}
-                  onChange={(e) => setEditCategory(e.target.value)}
-                  className="w-full glass-input px-3.5 py-2 rounded-xl text-xs"
-                  required
-                />
-              </div>
+                {/* Category */}
+                <div>
+                  <label className="text-[10px] font-bold uppercase text-gray-400 block mb-1">Category *</label>
+                  <div className="relative">
+                    <select
+                      value={editCategory}
+                      onChange={(e) => setEditCategory(e.target.value)}
+                      className="w-full bg-transparent border border-card-border rounded-xl text-sm p-2.5 focus:outline-none text-gray-800 dark:text-gray-200"
+                    >
+                      <option value="Electronics" className="bg-white dark:bg-slate-900">Electronics</option>
+                      <option value="Fashion" className="bg-white dark:bg-slate-900">Fashion</option>
+                      <option value="Home & Living" className="bg-white dark:bg-slate-900">Home & Living</option>
+                      <option value="Fitness & Outdoor" className="bg-white dark:bg-slate-900">Fitness & Outdoor</option>
+                    </select>
+                  </div>
+                </div>
 
-              <div>
-                <label className="block text-[10px] font-bold uppercase text-gray-400 mb-1">Image URL</label>
-                <input
-                  type="text"
-                  value={editImage}
-                  onChange={(e) => setEditImage(e.target.value)}
-                  className="w-full glass-input px-3.5 py-2 rounded-xl text-xs"
-                  required
-                />
-              </div>
+                {/* Stock */}
+                <div>
+                  <label className="text-[10px] font-bold uppercase text-gray-400 block mb-1">Stock Count</label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      value={editStock}
+                      onChange={(e) => setEditStock(e.target.value)}
+                      placeholder="10"
+                      className="w-full glass-input pl-10 pr-4 py-2.5 rounded-xl text-sm"
+                    />
+                    <Package size={16} className="absolute left-3.5 top-3.5 text-gray-400" />
+                  </div>
+                </div>
 
-              <div>
-                <label className="block text-[10px] font-bold uppercase text-gray-400 mb-1">Short Description</label>
-                <input
-                  type="text"
-                  value={editShortDesc}
-                  onChange={(e) => setEditShortDesc(e.target.value)}
-                  className="w-full glass-input px-3.5 py-2 rounded-xl text-xs"
-                  required
-                />
-              </div>
+                {/* Main Image URL & Optional Image URLs */}
+                <div className="sm:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="text-[10px] font-bold uppercase text-gray-400 block mb-1">Main Image URL *</label>
+                    <div className="relative">
+                      <input
+                        type="url"
+                        required
+                        value={editImage}
+                        onChange={(e) => setEditImage(e.target.value)}
+                        placeholder="https://images.unsplash.com/..."
+                        className="w-full glass-input pl-10 pr-4 py-2.5 rounded-xl text-sm"
+                      />
+                      <Image size={16} className="absolute left-3.5 top-3.5 text-gray-400" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold uppercase text-gray-400 block mb-1">Image URL 2 (Optional)</label>
+                    <div className="relative">
+                      <input
+                        type="url"
+                        value={editImage2}
+                        onChange={(e) => setEditImage2(e.target.value)}
+                        placeholder="https://images.unsplash.com/..."
+                        className="w-full glass-input pl-10 pr-4 py-2.5 rounded-xl text-sm"
+                      />
+                      <Image size={16} className="absolute left-3.5 top-3.5 text-gray-400" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold uppercase text-gray-400 block mb-1">Image URL 3 (Optional)</label>
+                    <div className="relative">
+                      <input
+                        type="url"
+                        value={editImage3}
+                        onChange={(e) => setEditImage3(e.target.value)}
+                        placeholder="https://images.unsplash.com/..."
+                        className="w-full glass-input pl-10 pr-4 py-2.5 rounded-xl text-sm"
+                      />
+                      <Image size={16} className="absolute left-3.5 top-3.5 text-gray-400" />
+                    </div>
+                  </div>
+                </div>
 
-              <div>
-                <label className="block text-[10px] font-bold uppercase text-gray-400 mb-1">Full Description</label>
-                <textarea
-                  value={editFullDesc}
-                  onChange={(e) => setEditFullDesc(e.target.value)}
-                  className="w-full glass-input px-3.5 py-2 rounded-xl text-xs min-h-[100px]"
-                  required
-                />
+                {/* Short Description */}
+                <div className="sm:col-span-2">
+                  <label className="text-[10px] font-bold uppercase text-gray-400 block mb-1">Short Description *</label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      required
+                      value={editShortDesc}
+                      onChange={(e) => setEditShortDesc(e.target.value)}
+                      placeholder="Wireless over-ear headphones with active noise cancellation."
+                      className="w-full glass-input pl-10 pr-4 py-2.5 rounded-xl text-sm"
+                    />
+                    <List size={16} className="absolute left-3.5 top-3.5 text-gray-400" />
+                  </div>
+                </div>
+
+                {/* Full Description */}
+                <div className="sm:col-span-2">
+                  <label className="text-[10px] font-bold uppercase text-gray-400 block mb-1">Full Specifications Description *</label>
+                  <div className="relative">
+                    <textarea
+                      required
+                      rows={4}
+                      value={editFullDesc}
+                      onChange={(e) => setEditFullDesc(e.target.value)}
+                      placeholder="Describe all key features, benefits, usage guides, and design specifications..."
+                      className="w-full glass-input pl-10 pr-4 py-2.5 rounded-xl text-sm focus:outline-none"
+                    />
+                    <FileText size={16} className="absolute left-3.5 top-3.5 text-gray-400" />
+                  </div>
+                </div>
+
+                {/* Technical Specifications */}
+                <div className="sm:col-span-2 border-t border-card-border pt-4">
+                  <div className="flex justify-between items-center mb-3">
+                    <h3 className="text-xs font-bold text-gray-500">Edit Technical Specifications</h3>
+                    <button
+                      type="button"
+                      onClick={() => setEditSpecs([...editSpecs, { key: "", value: "" }])}
+                      className="px-2.5 py-1 bg-brand/10 hover:bg-brand/20 text-brand dark:text-gold rounded-lg text-[10px] font-bold transition-all cursor-pointer border border-brand/20"
+                    >
+                      + Add Row
+                    </button>
+                  </div>
+                  <div className="space-y-3">
+                    {editSpecs.map((item, index) => (
+                      <div key={index} className="grid grid-cols-12 gap-2 items-center">
+                        <div className="col-span-5">
+                          <input
+                            type="text"
+                            placeholder="Spec Name"
+                            value={item.key}
+                            onChange={(e) => {
+                              const updated = [...editSpecs];
+                              updated[index].key = e.target.value;
+                              setEditSpecs(updated);
+                            }}
+                            className="w-full glass-input px-3 py-2 rounded-xl text-xs"
+                          />
+                        </div>
+                        <div className="col-span-6">
+                          <input
+                            type="text"
+                            placeholder="Spec Value"
+                            value={item.value}
+                            onChange={(e) => {
+                              const updated = [...editSpecs];
+                              updated[index].value = e.target.value;
+                              setEditSpecs(updated);
+                            }}
+                            className="w-full glass-input px-3 py-2 rounded-xl text-xs"
+                          />
+                        </div>
+                        <div className="col-span-1 text-right">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const updated = editSpecs.filter((_, i) => i !== index);
+                              setEditSpecs(updated);
+                            }}
+                            className="text-red-500 hover:text-red-700 font-bold text-sm"
+                          >
+                            &times;
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
               </div>
 
               <div className="flex gap-3 justify-end pt-4 border-t border-card-border">
