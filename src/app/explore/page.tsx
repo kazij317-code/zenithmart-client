@@ -19,6 +19,26 @@ interface Product {
   image: string;
 }
 
+const getProductLocation = (pId: string) => {
+  const locations = [
+    "Dhaka, Bangladesh",
+    "Silicon Valley, CA",
+    "New York, USA",
+    "London, UK",
+    "Tokyo, Japan",
+    "Paris, France",
+    "Sydney, Australia",
+    "Berlin, Germany"
+  ];
+  if (!pId) return locations[0];
+  let hash = 0;
+  for (let i = 0; i < pId.length; i++) {
+    hash = pId.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const index = Math.abs(hash) % locations.length;
+  return locations[index];
+};
+
 export default function Explore() {
   const { toggleFavorite, isFavorite } = useApp();
   const [products, setProducts] = useState<Product[]>([]);
@@ -250,7 +270,7 @@ export default function Explore() {
                         
                         {/* Meta Info: Location, Rating, Date */}
                         <div className="flex justify-between items-center text-[10px] text-gray-400 dark:text-slate-500 font-semibold mb-3">
-                          <span className="truncate max-w-[100px]">📍 Silicon Valley, CA</span>
+                          <span className="truncate max-w-[100px]">📍 {getProductLocation(pId)}</span>
                           <span className="flex items-center gap-0.5 text-amber-500">⭐ {p.rating.toFixed(2)}</span>
                         </div>
 

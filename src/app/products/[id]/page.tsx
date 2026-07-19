@@ -32,6 +32,26 @@ interface Product {
   reviews?: Review[];
 }
 
+const getProductLocation = (pId: string) => {
+  const locations = [
+    "Dhaka, Bangladesh",
+    "Silicon Valley, CA",
+    "New York, USA",
+    "London, UK",
+    "Tokyo, Japan",
+    "Paris, France",
+    "Sydney, Australia",
+    "Berlin, Germany"
+  ];
+  if (!pId) return locations[0];
+  let hash = 0;
+  for (let i = 0; i < pId.length; i++) {
+    hash = pId.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  const index = Math.abs(hash) % locations.length;
+  return locations[index];
+};
+
 export default function ProductDetails({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const id = resolvedParams.id;
@@ -431,7 +451,7 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
             <span className="text-[10px] uppercase font-bold text-amber-500 tracking-widest block mb-1">
               RECOMMENDATIONS
             </span>
-            <h2 className="text-2xl font-black mb-8 text-gray-900 dark:text-white">Related Luxury Properties</h2>
+            <h2 className="text-2xl font-black mb-8 text-gray-900 dark:text-white">Related Products</h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {recommendations.map((p) => {
@@ -447,7 +467,7 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
                     <div className="p-5 flex flex-col flex-grow">
                       {/* Meta Location & Rating */}
                       <div className="flex justify-between items-center text-[10px] text-gray-400 dark:text-slate-500 font-semibold mb-3">
-                        <span>📍 Silicon Valley, CA</span>
+                        <span>📍 {getProductLocation(recId)}</span>
                         <span className="bg-amber-500/10 text-amber-600 dark:text-gold font-bold px-2 py-0.5 rounded flex items-center gap-0.5">
                           ⭐ {p.rating.toFixed(2)}
                         </span>
