@@ -239,14 +239,14 @@ export default function AddItem() {
       });
       const data = await res.json();
       if (data.success) {
-        alert("Product added successfully!");
+        toast.success("Product added successfully!");
         router.push("/dashboard/admin");
       } else {
-        alert(data.error || "Failed to add product.");
+        toast.error(data.error || "Failed to add product.");
       }
     } catch (error) {
       console.error(error);
-      alert("Network error. Could not save product.");
+      toast.error("Network error. Could not save product.");
     } finally {
       setLoading(false);
     }
