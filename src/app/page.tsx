@@ -26,6 +26,35 @@ export default function Home() {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [subscribeEmail, setSubscribeEmail] = useState("");
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const slides = [
+    {
+      title: "Premium Electronics Collection",
+      desc: "Experience high-fidelity sound, smart gears, and professional optics.",
+      image: "https://images.unsplash.com/photo-1498049794561-7780e7231661?auto=format&fit=crop&w=1600&q=80",
+      price: "$299"
+    },
+    {
+      title: "Bespoke Luxury Apparel",
+      desc: "Minimalist fashion items designed for maximum comfort and style.",
+      image: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1600&q=80",
+      price: "$120"
+    },
+    {
+      title: "Modern Ergonomic Living",
+      desc: "Aesthetic furniture pieces supporting a healthy and active lifestyle.",
+      image: "https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=1600&q=80",
+      price: "$450"
+    }
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 4500);
+    return () => clearInterval(timer);
+  }, [slides.length]);
 
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:5000";
 
@@ -77,49 +106,63 @@ export default function Home() {
 
       {/* Hero Section */}
       <section className="relative w-full h-[65vh] flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 z-0">
+        {/* Background Image Carousel Slider */}
+        <div className="absolute inset-0 z-0 transition-all duration-1000 ease-in-out">
           <img
-            src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1600&q=80"
-            alt="Hero Background"
-            className="w-full h-full object-cover brightness-50 dark:brightness-[0.35] transition-all duration-700"
+            src={slides[currentSlide].image}
+            alt="Hero Background Slider"
+            className="w-full h-full object-cover brightness-[0.45] transition-all duration-1000 ease-in-out"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
         </div>
 
-        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand/20 backdrop-blur-md border border-brand/30 text-indigo-300 text-xs font-semibold uppercase tracking-wider mb-6 animate-pulse">
+        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-[#ffffff]">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 backdrop-blur-md border border-amber-500/30 text-amber-300 text-xs font-semibold uppercase tracking-wider mb-6 animate-pulse">
             <Sparkles size={14} className="text-gold" />
             AI-Powered Smart Shopping
           </div>
-          <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight mb-6">
+          <h1 className="text-4xl sm:text-6xl font-black tracking-tight mb-6 text-white leading-tight">
             Elevate Your Everyday with{" "}
-            <span className="bg-gradient-to-r from-indigo-400 to-amber-300 text-transparent bg-clip-text">
+            <span className="bg-gradient-to-r from-amber-400 to-indigo-300 text-transparent bg-clip-text">
               ZenithMart
             </span>
           </h1>
-          <p className="text-base sm:text-xl text-gray-200 max-w-2xl mx-auto mb-8 font-light leading-relaxed">
+          <p className="text-sm sm:text-base text-slate-200 max-w-2xl mx-auto mb-8 font-medium leading-relaxed">
             Discover a handpicked selection of premium electronics, fashion, and lifestyle items tailored perfectly for you by our smart AI.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/explore"
-              className="px-8 py-3 rounded-xl bg-brand text-white font-bold hover:bg-brand-hover shadow-lg shadow-brand/25 transition-all transform hover:-translate-y-0.5 flex items-center gap-2"
+              className="px-8 py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs transition-colors shadow-md shadow-amber-500/10 flex items-center gap-2"
             >
               Explore Shop <ArrowRight size={18} />
             </Link>
             <Link
               href="/about"
-              className="px-8 py-3 rounded-xl bg-white/10 text-white font-bold hover:bg-white/20 backdrop-blur-sm border border-white/20 transition-all transform hover:-translate-y-0.5"
+              className="px-8 py-3 rounded-xl bg-white/10 text-white font-bold hover:bg-white/20 backdrop-blur-sm border border-white/20 text-xs transition-all"
             >
               How It Works
             </Link>
           </div>
         </div>
+
+        {/* Carousel Indicators */}
+        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex gap-2 z-25">
+          {slides.map((_, sIdx) => (
+            <button
+              key={sIdx}
+              onClick={() => setCurrentSlide(sIdx)}
+              className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                currentSlide === sIdx ? "w-6 bg-amber-500" : "w-2 bg-white/50"
+              }`}
+            />
+          ))}
+        </div>
       </section>
 
       {/* Main Content Sections */}
       <main className="flex-1 space-y-24 py-16">
-        
+
         {/* Section 1: Categories */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
@@ -185,27 +228,16 @@ export default function Home() {
                       <img src={p.image} alt={p.title} className="w-full h-full object-cover" />
                       <button
                         onClick={() => toggleFavorite(pId)}
-                        className={`absolute top-4 right-4 p-2 rounded-xl shadow-md backdrop-blur-sm transition-all duration-300 hover:scale-105 ${
-                          isFavorite(pId)
-                            ? "bg-[#180A18]/90 border border-transparent"
-                            : "bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800"
-                        }`}
+                        className="absolute top-4 right-4 p-2 rounded-xl bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 shadow-md backdrop-blur-sm transition-all hover:scale-105"
                       >
-                        <Heart
-                          size={16}
-                          className={`transition-all duration-300 ${
-                            isFavorite(pId)
-                              ? "fill-[#FF2D55] text-[#FF2D55]"
-                              : "text-slate-400 dark:text-gray-500"
-                          }`}
-                        />
+                        <Heart size={16} className={isFavorite(pId) ? "fill-rose-500 text-rose-500" : "text-slate-400 dark:text-gray-500"} />
                       </button>
                     </div>
                     <div className="p-5 flex flex-col flex-1">
                       <span className="text-[10px] uppercase font-bold text-brand dark:text-gold tracking-wider mb-1.5">{p.category}</span>
                       <h3 className="font-bold text-base truncate mb-2">{p.title}</h3>
                       <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 mb-4 leading-relaxed">{p.shortDescription}</p>
-                      
+
                       <div className="mt-auto flex items-center justify-between">
                         <div>
                           <span className="text-sm font-semibold text-gray-400">Price</span>
