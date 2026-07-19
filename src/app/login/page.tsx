@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
-import { Globe, Lock, Mail, ArrowRight, ShieldAlert, Sparkles, Eye } from "lucide-react";
+import { Globe, Lock, Mail, ArrowRight, ShieldAlert, Sparkles, Eye, EyeOff } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import Navbar from "@/components/Navbar";
 import { toast } from "react-hot-toast";
@@ -14,6 +14,8 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -125,7 +127,7 @@ export default function Login() {
                 </div>
                 <div className="relative">
                   <input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -133,8 +135,12 @@ export default function Login() {
                     className="w-full glass-input px-4 py-3 rounded-xl pl-10 pr-10 text-sm transition-all focus:outline-none"
                   />
                   <Lock size={16} className="absolute left-3.5 top-4 text-slate-400 dark:text-gray-500" />
-                  <button type="button" className="absolute right-3.5 top-4 text-slate-400 dark:text-gray-500 hover:text-slate-600 dark:hover:text-slate-400 cursor-pointer bg-transparent border-none">
-                    <Eye size={16} />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3.5 top-4 text-slate-400 dark:text-gray-500 hover:text-slate-600 dark:hover:text-slate-400 cursor-pointer bg-transparent border-none"
+                  >
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
               </div>
