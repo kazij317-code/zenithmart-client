@@ -194,7 +194,13 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
   }
 
   const pId = product._id || product.id || "";
-  const allImages = product.images && product.images.length > 0 ? [product.image, ...product.images] : [product.image];
+  const allImages = Array.from(
+    new Set(
+      product.images && product.images.length > 0
+        ? [product.image, ...product.images]
+        : [product.image]
+    )
+  );
 
   return (
     <div className="flex flex-col min-h-screen">

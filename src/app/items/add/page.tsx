@@ -224,7 +224,7 @@ export default function AddItem() {
       category,
       stock: Number(stock),
       image,
-      images: [image, image2, image3].filter(Boolean),
+      images: [image2, image3].filter(Boolean),
       specifications
     };
 
