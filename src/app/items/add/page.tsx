@@ -23,7 +23,7 @@ export default function AddItem() {
   const [stock, setStock] = useState("10");
   const [image, setImage] = useState("");
   const [loading, setLoading] = useState(false);
-  
+
   const [image2, setImage2] = useState("");
   const [image3, setImage3] = useState("");
 
@@ -78,7 +78,7 @@ export default function AddItem() {
 
     const lines = text.split("\n");
     let currentField = "";
-    
+
     let tempTitle = "";
     let tempPrice = "";
     let tempCategory = "Electronics";
@@ -93,7 +93,7 @@ export default function AddItem() {
       if (!cleanLine) return;
 
       const lowerLine = cleanLine.toLowerCase();
-      
+
       // Check for standalone header tags
       if (lowerLine === "short description:" || lowerLine === "short desc:" || lowerLine === "summary:") {
         currentField = "short_desc";
@@ -191,7 +191,7 @@ export default function AddItem() {
     if (tempStock) setStock(tempStock);
     if (tempShortDesc) setShortDescription(tempShortDesc);
     if (tempFullDesc) setFullDescription(tempFullDesc);
-    
+
     if (tempImages.length > 0) {
       setImage(tempImages[0] || "");
       setImage2(tempImages[1] || "");
@@ -306,7 +306,7 @@ export default function AddItem() {
 
         <form onSubmit={handleSubmit} className="glass-panel p-6 sm:p-8 rounded-2xl border border-card-border space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            
+
             {/* Title */}
             <div className="sm:col-span-2">
               <label className="text-[10px] font-bold uppercase text-gray-400 block mb-1">Product Title *</label>
