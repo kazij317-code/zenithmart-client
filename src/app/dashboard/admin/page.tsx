@@ -5,6 +5,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AIChatBot from "@/components/AIChatBot";
 import { useAuth } from "@/context/AuthContext";
+import { authClient } from "@/lib/auth-client";
 import { Plus, Users, DollarSign, Package, ShoppingCart, Ban, ShieldCheck, Trash2, Mail, Sparkles, LogOut, Edit, Eye, X, CreditCard, Shield, Grid, PlusCircle, Compass, User, Tag, List, FileText, Image } from "lucide-react";
 import Link from "next/link";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
@@ -71,7 +72,8 @@ export default function AdminDashboard() {
 
   const fetchAdminData = async () => {
     setLoading(true);
-    const token = localStorage.getItem("better-auth.session_token") || "";
+    const tokenRes = await authClient.token();
+    const token = tokenRes.data?.token || "";
     try {
       // 1. Fetch Stats & Chart
       const statsRes = await fetch(`${BASE_URL}/api/admin/stats`, {
@@ -163,7 +165,8 @@ export default function AdminDashboard() {
   }, [user, activeTab]);
 
   const handleBlockUser = async (uId: string, currentBlockedStatus: boolean) => {
-    const token = localStorage.getItem("better-auth.session_token") || "";
+    const tokenRes = await authClient.token();
+    const token = tokenRes.data?.token || "";
     try {
       const res = await fetch(`${BASE_URL}/api/admin/users/${uId}/block`, {
         method: "PATCH",
@@ -187,7 +190,8 @@ export default function AdminDashboard() {
 
   const handleDeleteProduct = async (pId: string) => {
     if (!confirm("Are you sure you want to delete this product?")) return;
-    const token = localStorage.getItem("better-auth.session_token") || "";
+    const tokenRes = await authClient.token();
+    const token = tokenRes.data?.token || "";
     try {
       const res = await fetch(`${BASE_URL}/api/products/${pId}`, {
         method: "DELETE",
@@ -219,22 +223,22 @@ export default function AdminDashboard() {
     const specsArray = p.specifications && Object.keys(p.specifications).length > 0
       ? Object.entries(p.specifications).map(([key, value]) => ({ key, value }))
       : [
-          { key: "Display", value: "" },
-          { key: "AI Processor", value: "" },
-          { key: "Connectivity", value: "" },
-          { key: "Camera", value: "" },
-          { key: "Battery Life", value: "" },
-          { key: "Charging", value: "" },
-          { key: "Audio", value: "" },
-          { key: "Microphone", value: "" },
-          { key: "Water Resistance", value: "" },
-          { key: "Frame Material", value: "" },
-          { key: "Weight", value: "" },
-          { key: "Compatibility", value: "" },
-          { key: "Voice Assistant", value: "" },
-          { key: "Color", value: "" },
-          { key: "Warranty", value: "" }
-        ];
+        { key: "Display", value: "" },
+        { key: "AI Processor", value: "" },
+        { key: "Connectivity", value: "" },
+        { key: "Camera", value: "" },
+        { key: "Battery Life", value: "" },
+        { key: "Charging", value: "" },
+        { key: "Audio", value: "" },
+        { key: "Microphone", value: "" },
+        { key: "Water Resistance", value: "" },
+        { key: "Frame Material", value: "" },
+        { key: "Weight", value: "" },
+        { key: "Compatibility", value: "" },
+        { key: "Voice Assistant", value: "" },
+        { key: "Color", value: "" },
+        { key: "Warranty", value: "" }
+      ];
     setEditSpecs(specsArray);
 
     setEditShortDesc(p.shortDescription || "");
@@ -245,7 +249,8 @@ export default function AdminDashboard() {
   const handleEditSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingProduct) return;
-    const token = localStorage.getItem("better-auth.session_token") || "";
+    const tokenRes = await authClient.token();
+    const token = tokenRes.data?.token || "";
 
     const specifications: Record<string, string> = {};
     editSpecs.forEach((item) => {
@@ -285,7 +290,8 @@ export default function AdminDashboard() {
   };
 
   const handleToggleOrderStatus = async (orderId: string, currentStatus: string) => {
-    const token = localStorage.getItem("better-auth.session_token") || "";
+    const tokenRes = await authClient.token();
+    const token = tokenRes.data?.token || "";
     const newStatus = currentStatus === "Pending" ? "Confirmed" : "Pending";
     try {
       const res = await fetch(`${BASE_URL}/api/admin/orders/${orderId}/status`, {
@@ -319,7 +325,7 @@ export default function AdminDashboard() {
 
       <main className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="flex flex-col lg:flex-row gap-8">
-          
+
           {/* Admin Sidebar */}
           <div className="w-full lg:w-64 space-y-6">
             {/* Profile Card */}
@@ -346,91 +352,85 @@ export default function AdminDashboard() {
 
               <button
                 onClick={() => setActiveTab("overview")}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
-                  activeTab === "overview"
-                    ? "bg-sky-50 dark:bg-sky-950/20 text-sky-500 dark:text-sky-400 border border-sky-100 dark:border-sky-900/30"
-                    : "hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-600 dark:text-gray-300"
-                }`}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all cursor-pointer ${activeTab === "overview"
+                  ? "bg-sky-50 dark:bg-sky-950/20 text-sky-500 dark:text-sky-400 border border-sky-100 dark:border-sky-900/30"
+                  : "hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-600 dark:text-gray-300"
+                  }`}
               >
                 <Grid size={16} /> Overview
               </button>
 
               <button
                 onClick={() => setActiveTab("users")}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
-                  activeTab === "users"
-                    ? "bg-sky-50 dark:bg-sky-950/20 text-sky-500 dark:text-sky-400 border border-sky-100 dark:border-sky-900/30"
-                    : "hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-600 dark:text-gray-300"
-                }`}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all cursor-pointer ${activeTab === "users"
+                  ? "bg-sky-50 dark:bg-sky-950/20 text-sky-500 dark:text-sky-400 border border-sky-100 dark:border-sky-900/30"
+                  : "hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-600 dark:text-gray-300"
+                  }`}
               >
                 <Users size={16} /> Manage Users
               </button>
 
               <button
                 onClick={() => setActiveTab("products")}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
-                  activeTab === "products"
-                    ? "bg-sky-50 dark:bg-sky-950/20 text-sky-500 dark:text-sky-400 border border-sky-100 dark:border-sky-900/30"
-                    : "hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-600 dark:text-gray-300"
-                }`}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all cursor-pointer ${activeTab === "products"
+                  ? "bg-sky-50 dark:bg-sky-950/20 text-sky-500 dark:text-sky-400 border border-sky-100 dark:border-sky-900/30"
+                  : "hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-600 dark:text-gray-300"
+                  }`}
               >
                 <Compass size={16} /> Manage Catalog
               </button>
 
               <button
                 onClick={() => setActiveTab("transactions")}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
-                  activeTab === "transactions"
-                    ? "bg-sky-50 dark:bg-sky-950/20 text-sky-500 dark:text-sky-400 border border-sky-100 dark:border-sky-900/30"
-                    : "hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-600 dark:text-gray-300"
-                }`}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all cursor-pointer ${activeTab === "transactions"
+                  ? "bg-sky-50 dark:bg-sky-950/20 text-sky-500 dark:text-sky-400 border border-sky-100 dark:border-sky-900/30"
+                  : "hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-600 dark:text-gray-300"
+                  }`}
               >
                 <CreditCard size={16} /> Transactions
               </button>
 
               <button
                 onClick={() => setActiveTab("inquiries")}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
-                  activeTab === "inquiries"
-                    ? "bg-sky-50 dark:bg-sky-950/20 text-sky-500 dark:text-sky-400 border border-sky-100 dark:border-sky-900/30"
-                    : "hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-600 dark:text-gray-300"
-                }`}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all cursor-pointer ${activeTab === "inquiries"
+                  ? "bg-sky-50 dark:bg-sky-950/20 text-sky-500 dark:text-sky-400 border border-sky-100 dark:border-sky-900/30"
+                  : "hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-600 dark:text-gray-300"
+                  }`}
               >
                 <Mail size={16} /> Inquiries
               </button>
 
               <button
                 onClick={() => setActiveTab("subscribers")}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
-                  activeTab === "subscribers"
-                    ? "bg-sky-50 dark:bg-sky-950/20 text-sky-500 dark:text-sky-400 border border-sky-100 dark:border-sky-900/30"
-                    : "hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-600 dark:text-gray-300"
-                }`}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-xs font-bold transition-all cursor-pointer ${activeTab === "subscribers"
+                  ? "bg-sky-50 dark:bg-sky-950/20 text-sky-500 dark:text-sky-400 border border-sky-100 dark:border-sky-900/30"
+                  : "hover:bg-gray-100 dark:hover:bg-slate-800 text-gray-600 dark:text-gray-300"
+                  }`}
               >
                 <Sparkles size={16} /> Subscribers
               </button>
 
               <div className="pt-4 border-t border-card-border mt-4">
-              <Link
-                href="/items/add"
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 border border-dashed border-card-border mb-2"
-              >
-                <Plus size={16} className="text-brand dark:text-gold" /> Add New Product
-              </Link>
+                <Link
+                  href="/items/add"
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 border border-dashed border-card-border mb-2"
+                >
+                  <Plus size={16} className="text-brand dark:text-gold" /> Add New Product
+                </Link>
 
-              <button
-                onClick={logout}
-                className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
-              >
-                <LogOut size={16} /> Sign Out
-              </button>
+                <button
+                  onClick={logout}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-semibold text-red-500 hover:bg-red-500/10 transition-colors cursor-pointer"
+                >
+                  <LogOut size={16} /> Sign Out
+                </button>
+              </div>
             </div>
           </div>
-        </div>
 
           {/* Content panel */}
           <div className="flex-1 bg-[#ffffff] dark:bg-slate-900 rounded-3xl p-6 sm:p-8 border border-slate-800 dark:border-slate-700 min-h-[450px] shadow-sm">
-            
+
             {/* OVERVIEW PANEL */}
             {activeTab === "overview" && (
               <div className="space-y-8">
@@ -458,10 +458,10 @@ export default function AdminDashboard() {
                   {/* Total Products (Stays) */}
                   <div className="p-6 bg-[#ffffff] dark:bg-slate-900 rounded-3xl border border-slate-800 dark:border-slate-700 flex justify-between items-center shadow-sm">
                     <div className="space-y-1">
-                      <span className="text-[10px] text-gray-400 font-extrabold uppercase tracking-wider block">Total Stays</span>
+                      <span className="text-[10px] text-gray-400 font-extrabold uppercase tracking-wider block">Total Products</span>
                       <span className="text-3xl font-black block">{stats.productCount}</span>
                       <button onClick={() => setActiveTab("products")} className="text-[10px] text-sky-500 font-bold hover:underline flex items-center gap-1 cursor-pointer">
-                        Manage stays &rarr;
+                        Manage products &rarr;
                       </button>
                     </div>
                     <div className="w-12 h-12 rounded-2xl bg-purple-50 dark:bg-purple-950/20 flex items-center justify-center text-purple-500">
@@ -524,8 +524,8 @@ export default function AdminDashboard() {
                         <AreaChart data={salesChart} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                           <defs>
                             <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
-                              <stop offset="5%" stopColor="#4F46E5" stopOpacity={0.2}/>
-                              <stop offset="95%" stopColor="#4F46E5" stopOpacity={0}/>
+                              <stop offset="5%" stopColor="#4F46E5" stopOpacity={0.2} />
+                              <stop offset="95%" stopColor="#4F46E5" stopOpacity={0} />
                             </linearGradient>
                           </defs>
                           <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" className="dark:stroke-slate-800" />
@@ -545,7 +545,7 @@ export default function AdminDashboard() {
             {activeTab === "products" && (
               <div className="space-y-6">
                 <h2 className="text-xl font-bold pb-4 border-b border-card-border">Manage Catalog</h2>
-                
+
                 <div className="overflow-x-auto rounded-t-2xl border border-card-border">
                   <table className="w-full text-left text-xs border-collapse">
                     <thead>
@@ -623,7 +623,7 @@ export default function AdminDashboard() {
                         const joinDate = u.createdAt ? new Date(u.createdAt).toLocaleDateString() : "7/15/2026";
                         // Use dynamic profile image URL from Better-Auth signup if present
                         let avatarUrl = u.image || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=128&auto=format&fit=crop";
-                        
+
                         return (
                           <tr key={uId} className="hover:bg-gray-50/50 dark:hover:bg-slate-900/10">
                             <td className="p-4 flex items-center gap-3">
@@ -634,20 +634,18 @@ export default function AdminDashboard() {
                               </div>
                             </td>
                             <td className="p-4">
-                              <span className={`px-3 py-1 rounded-full text-[10px] font-bold ${
-                                u.role === "admin"
-                                  ? "bg-purple-100 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400"
-                                  : "bg-sky-100 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400"
-                              }`}>
+                              <span className={`px-3 py-1 rounded-full text-[10px] font-bold ${u.role === "admin"
+                                ? "bg-purple-100 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400"
+                                : "bg-sky-100 dark:bg-sky-950/40 text-sky-600 dark:text-sky-400"
+                                }`}>
                                 {u.role === "admin" ? "Admin" : "User"}
                               </span>
                             </td>
                             <td className="p-4">
-                              <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${
-                                u.isBlocked
-                                  ? "bg-rose-100 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400"
-                                  : "bg-emerald-100 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400"
-                              }`}>
+                              <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold ${u.isBlocked
+                                ? "bg-rose-100 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400"
+                                : "bg-emerald-100 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400"
+                                }`}>
                                 {u.isBlocked ? "Blocked" : "Active"}
                               </span>
                             </td>
@@ -656,11 +654,10 @@ export default function AdminDashboard() {
                               {u.role !== "admin" && (
                                 <button
                                   onClick={() => handleBlockUser(uId, u.isBlocked)}
-                                  className={`px-4 py-1.5 rounded-xl text-xs font-bold uppercase transition-colors flex items-center gap-1.5 ml-auto cursor-pointer ${
-                                    u.isBlocked
-                                      ? "bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20"
-                                      : "bg-red-50 text-red-500 hover:bg-red-100 dark:bg-red-950/20 dark:text-red-400"
-                                  }`}
+                                  className={`px-4 py-1.5 rounded-xl text-xs font-bold uppercase transition-colors flex items-center gap-1.5 ml-auto cursor-pointer ${u.isBlocked
+                                    ? "bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20"
+                                    : "bg-red-50 text-red-500 hover:bg-red-100 dark:bg-red-950/20 dark:text-red-400"
+                                    }`}
                                 >
                                   {u.isBlocked ? "Unblock" : "Block"}
                                 </button>
@@ -699,8 +696,8 @@ export default function AdminDashboard() {
                       <tbody className="divide-y divide-card-border">
                         {inquiries.map((inq) => {
                           const inqId = inq._id || inq.id || "";
-                          const inqDate = inq.createdAt 
-                            ? new Date(inq.createdAt).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) 
+                          const inqDate = inq.createdAt
+                            ? new Date(inq.createdAt).toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })
                             : "Jul 18, 05:56 PM";
                           return (
                             <tr key={inqId} className="hover:bg-gray-50/50 dark:hover:bg-slate-900/10">
@@ -816,11 +813,10 @@ export default function AdminDashboard() {
                               <td className="p-4">
                                 <button
                                   onClick={() => handleToggleOrderStatus(orderId, order.status || "Pending")}
-                                  className={`px-2 py-1 rounded text-[10px] font-bold uppercase transition-all hover:scale-105 cursor-pointer ${
-                                    order.status === "Pending" 
-                                      ? "bg-amber-500/10 text-amber-500 hover:bg-amber-500/20" 
-                                      : "bg-green-500/10 text-green-500 hover:bg-green-500/20"
-                                  }`}
+                                  className={`px-2 py-1 rounded text-[10px] font-bold uppercase transition-all hover:scale-105 cursor-pointer ${order.status === "Pending"
+                                    ? "bg-amber-500/10 text-amber-500 hover:bg-amber-500/20"
+                                    : "bg-green-500/10 text-green-500 hover:bg-green-500/20"
+                                    }`}
                                 >
                                   {order.status || "Pending"}
                                 </button>
@@ -864,7 +860,7 @@ export default function AdminDashboard() {
 
             <form onSubmit={handleEditSubmit} className="space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                
+
                 {/* Product Title */}
                 <div className="sm:col-span-2">
                   <label className="text-[10px] font-bold uppercase text-gray-400 block mb-1">Product Title *</label>
@@ -904,12 +900,12 @@ export default function AdminDashboard() {
                     <select
                       value={editCategory}
                       onChange={(e) => setEditCategory(e.target.value)}
-                      className="w-full bg-transparent border border-card-border rounded-xl text-sm p-2.5 focus:outline-none text-gray-800 dark:text-gray-200"
+                      className="w-full bg-white dark:bg-slate-900 border border-card-border rounded-xl text-sm p-2.5 focus:outline-none text-gray-800 dark:text-gray-200"
                     >
-                      <option value="Electronics" className="bg-white dark:bg-slate-900">Electronics</option>
-                      <option value="Fashion" className="bg-white dark:bg-slate-900">Fashion</option>
-                      <option value="Home & Living" className="bg-white dark:bg-slate-900">Home & Living</option>
-                      <option value="Fitness & Outdoor" className="bg-white dark:bg-slate-900">Fitness & Outdoor</option>
+                      <option value="Electronics" className="bg-white dark:bg-slate-900 text-gray-800 dark:text-gray-200">Electronics</option>
+                      <option value="Fashion" className="bg-white dark:bg-slate-900 text-gray-800 dark:text-gray-200">Fashion</option>
+                      <option value="Home & Living" className="bg-white dark:bg-slate-900 text-gray-800 dark:text-gray-200">Home & Living</option>
+                      <option value="Fitness & Outdoor" className="bg-white dark:bg-slate-900 text-gray-800 dark:text-gray-200">Fitness & Outdoor</option>
                     </select>
                   </div>
                 </div>

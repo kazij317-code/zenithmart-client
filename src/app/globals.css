@@ -42,7 +42,6 @@
   --color-gold: var(--gold);
   --color-gold-hover: var(--gold-hover);
   --color-slate-dark: var(--background);
-  --color-white: var(--foreground);
 }
 
 body {

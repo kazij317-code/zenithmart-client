@@ -9,6 +9,7 @@ import { Package, Tag, DollarSign, List, FileText, Image, Plus, ArrowLeft } from
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
+import { authClient } from "@/lib/auth-client";
 
 export default function AddItem() {
   const { user } = useAuth();
@@ -47,24 +48,28 @@ export default function AddItem() {
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:5000";
 
   const handleAutofill = () => {
-    setTitle("Zenith Pro VR Headset");
-    setShortDescription("Aerospace-grade standalone VR headset with 8K Micro-OLED display.");
-    setFullDescription("Experience ultra-realistic virtual reality with the Zenith Pro standalone VR headset. Featuring dual 4K Micro-OLED panels, Snapdragon XR2+ Gen 2 chipset, spatial audio, and hand/eye tracking capabilities.");
-    setPrice("899");
-    setCategory("Electronics");
-    setStock("25");
-    setImage("https://images.unsplash.com/photo-1593508512255-86ab42a8e620?q=80&w=400&auto=format&fit=crop");
-    setImage2("https://images.unsplash.com/photo-1592478411213-6153e4ebc07d?q=80&w=400&auto=format&fit=crop");
-    setImage3("");
+    setTitle("Zenith Predator X Gaming Laptop");
+    setShortDescription("High-performance gaming laptop featuring Intel Core Ultra 9 processor, RTX 5080 graphics, and a stunning 240Hz QHD display.");
+    setFullDescription("The Zenith Predator X Gaming Laptop is designed for gamers, developers, and creators who demand exceptional performance. Equipped with cutting-edge hardware, advanced cooling technology, AI-powered performance optimization, and long battery life, it delivers an immersive gaming and productivity experience.");
+    setPrice("1899");
+    setCategory("Computers");
+    setStock("15");
+    setImage("https://images.unsplash.com/photo-1496181133206-80ce9b88a853");
+    setImage2("https://images.unsplash.com/photo-1517336714739-489689fd1ca8");
+    setImage3("https://images.unsplash.com/photo-1517694712202-14dd9538aa97");
     setSpecs([
-      { key: "Display", value: "Dual 4K Micro-OLED AR/VR Display" },
-      { key: "Processor", value: "Snapdragon XR2+ Gen 2" },
-      { key: "Memory", value: "12GB LPDDR5X RAM" },
-      { key: "Storage", value: "256GB Standalone Storage" },
-      { key: "Tracking", value: "6 DoF Inside-Out Camera Tracking" },
-      { key: "Audio", value: "Spatial Sound Speakers" },
+      { key: "Display", value: "16-inch QHD 240Hz IPS" },
+      { key: "Processor", value: "Intel Core Ultra 9" },
+      { key: "Graphics", value: "NVIDIA RTX 5080 16GB" },
+      { key: "RAM", value: "32GB DDR5" },
+      { key: "Storage", value: "2TB NVMe SSD" },
+      { key: "Battery", value: "Up to 12 Hours" },
+      { key: "Keyboard", value: "Per-Key RGB Mechanical" },
+      { key: "Operating System", value: "Windows 11 Pro" },
       { key: "Connectivity", value: "Wi-Fi 7 & Bluetooth 5.4" },
-      { key: "Battery Life", value: "Up to 3 Hours Active Use" }
+      { key: "Ports", value: "Thunderbolt 4, HDMI 2.1, USB-C" },
+      { key: "Weight", value: "2.2kg" },
+      { key: "Warranty", value: "2 Years" }
     ]);
   };
 
@@ -207,7 +212,8 @@ export default function AddItem() {
     }
 
     setLoading(true);
-    const token = localStorage.getItem("better-auth.session_token") || "";
+    const tokenRes = await authClient.token();
+    const token = tokenRes.data?.token || "";
 
     const specifications: Record<string, string> = {};
     specs.forEach((item) => {
@@ -340,12 +346,12 @@ export default function AddItem() {
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full bg-transparent border border-card-border rounded-xl text-sm p-2.5 focus:outline-none"
+                  className="w-full bg-white dark:bg-slate-900 border border-card-border rounded-xl text-sm p-2.5 focus:outline-none text-gray-800 dark:text-gray-200"
                 >
-                  <option value="Electronics" className="bg-white dark:bg-slate-900">Electronics</option>
-                  <option value="Fashion" className="bg-white dark:bg-slate-900">Fashion</option>
-                  <option value="Home & Living" className="bg-white dark:bg-slate-900">Home & Living</option>
-                  <option value="Fitness & Outdoor" className="bg-white dark:bg-slate-900">Fitness & Outdoor</option>
+                  <option value="Electronics" className="bg-white dark:bg-slate-900 text-gray-800 dark:text-gray-200">Electronics</option>
+                  <option value="Fashion" className="bg-white dark:bg-slate-900 text-gray-800 dark:text-gray-200">Fashion</option>
+                  <option value="Home & Living" className="bg-white dark:bg-slate-900 text-gray-800 dark:text-gray-200">Home & Living</option>
+                  <option value="Fitness & Outdoor" className="bg-white dark:bg-slate-900 text-gray-800 dark:text-gray-200">Fitness & Outdoor</option>
                 </select>
               </div>
             </div>
