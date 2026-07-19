@@ -7,7 +7,7 @@ import AIChatBot from "@/components/AIChatBot";
 import { useApp } from "@/context/AppContext";
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
-import { Heart, ShoppingCart, Star, Sparkles, ShieldCheck, Check, Send } from "lucide-react";
+import { Heart, ShoppingCart, Star, Sparkles, ShieldCheck, Check, Send, CheckCircle } from "lucide-react";
 import { toast } from "react-hot-toast";
 
 interface Review {
@@ -70,6 +70,7 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewComment, setReviewComment] = useState("");
   const [submittingReview, setSubmittingReview] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   useEffect(() => {
     if (user && user.name) {
@@ -81,11 +82,10 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
     e.preventDefault();
     if (!user) {
       toast.error("You must be logged in to leave a rating and review");
-      alert("You must be logged in to leave a rating and review");
       return;
     }
     if (!reviewName || !reviewComment) {
-      alert("Please fill in all fields.");
+      toast.error("Please fill in all fields.");
       return;
     }
     setSubmittingReview(true);
@@ -112,10 +112,12 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
         setReviewName(user?.name || "");
         setReviewComment("");
         setReviewRating(5);
-        alert("Review posted successfully!");
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 6000);
       }
     } catch (err) {
       console.error(err);
+      toast.error("An error occurred while posting your review.");
     } finally {
       setSubmittingReview(false);
     }
@@ -399,6 +401,13 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
               <p className="text-[10px] text-gray-400 font-medium">Share your feedback about this product with the community</p>
             </div>
 
+            {showSuccess && (
+              <div className="flex items-center gap-2 px-4 py-3 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 rounded-xl text-xs font-semibold">
+                <CheckCircle size={16} className="text-emerald-500 flex-shrink-0" />
+                <span>Your experience review has been recorded! Thank you.</span>
+              </div>
+            )}
+
             <form onSubmit={handleReviewSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -408,7 +417,7 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
                     required
                     value={reviewName}
                     onChange={(e) => setReviewName(e.target.value)}
-                    placeholder="e.g. Nabhan"
+                    placeholder="e.g. John Doe"
                     className="w-full glass-input px-3.5 py-2.5 rounded-xl text-xs"
                   />
                 </div>
@@ -417,13 +426,13 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
                   <select
                     value={reviewRating}
                     onChange={(e) => setReviewRating(Number(e.target.value))}
-                    className="w-full bg-transparent border border-amber-500 rounded-xl text-xs p-2.5 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 cursor-pointer"
+                    className="w-full bg-transparent border border-card-border rounded-xl text-xs p-2.5 focus:outline-none focus:border-amber-500 focus:ring-1 focus:ring-amber-500 cursor-pointer"
                   >
-                    <option value={5} className="bg-white dark:bg-slate-900">5 Stars (Exceptional)</option>
-                    <option value={4} className="bg-white dark:bg-slate-900">4 Stars (Good)</option>
-                    <option value={3} className="bg-white dark:bg-slate-900">3 Stars (Average)</option>
-                    <option value={2} className="bg-white dark:bg-slate-900">2 Stars (Poor)</option>
-                    <option value={1} className="bg-white dark:bg-slate-900">1 Star (Terrible)</option>
+                    <option value={5} className="bg-white dark:bg-slate-900 text-gray-800 dark:text-gray-200">5 Stars (Exceptional)</option>
+                    <option value={4} className="bg-white dark:bg-slate-900 text-gray-800 dark:text-gray-200">4 Stars (Good)</option>
+                    <option value={3} className="bg-white dark:bg-slate-900 text-gray-800 dark:text-gray-200">3 Stars (Average)</option>
+                    <option value={2} className="bg-white dark:bg-slate-900 text-gray-800 dark:text-gray-200">2 Stars (Poor)</option>
+                    <option value={1} className="bg-white dark:bg-slate-900 text-gray-800 dark:text-gray-200">1 Star (Terrible)</option>
                   </select>
                 </div>
               </div>
@@ -435,7 +444,7 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
                   rows={4}
                   value={reviewComment}
                   onChange={(e) => setReviewComment(e.target.value)}
-                  placeholder="Tell us what you liked or disliked about this product..."
+                  placeholder="Share details of your stay..."
                   className="w-full glass-input px-3.5 py-2.5 rounded-xl text-xs min-h-[80px]"
                 />
               </div>
