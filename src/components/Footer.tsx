@@ -1,88 +1,101 @@
 import React from "react";
 import Link from "next/link";
-import { Mail, Phone, MapPin, Globe } from "lucide-react";
+import { Mail, Phone, MapPin } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="bg-slate-900 text-slate-300 border-t border-slate-800 pt-16 pb-8 mt-auto w-full">
+    <footer className="bg-[#ffffff] dark:bg-slate-950 text-slate-600 dark:text-slate-400 border-t border-slate-200 dark:border-slate-800 pt-16 pb-8 mt-auto w-full">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
           {/* Brand Info */}
           <div>
-            <span className="text-2xl font-bold tracking-wider text-white bg-gradient-to-r from-indigo-400 to-amber-300 bg-clip-text text-transparent">
+            <span className="text-xl font-bold tracking-wider text-amber-500 dark:text-gold">
               ZenithMart
             </span>
-            <p className="mt-4 text-sm text-slate-400 leading-relaxed">
-              Premium curated e-commerce marketplace powered by advanced agentic AI shopping assistance. Find exactly what fits your lifestyle.
+            <p className="mt-4 text-xs leading-relaxed max-w-xs text-slate-500 dark:text-slate-400">
+              Curated luxury shopping experience and bespoke product selections. Reimagining premium marketplace options across the globe.
             </p>
-            <div className="mt-6 flex space-x-4">
-              <a href="https://zenithmart.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors text-xs flex items-center gap-1.5 border border-slate-800 px-3 py-1.5 rounded-lg bg-slate-950/20">
-                <Globe size={14} /> Website
+            <div className="mt-6 flex gap-2">
+              <a href="https://x.com" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors flex items-center justify-center text-slate-600 dark:text-slate-300 font-bold text-xs">
+                X
+              </a>
+              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors flex items-center justify-center text-slate-600 dark:text-slate-300 font-bold text-xs">
+                Ig
+              </a>
+              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors flex items-center justify-center text-slate-600 dark:text-slate-300 font-bold text-xs">
+                In
+              </a>
+              <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors flex items-center justify-center text-slate-600 dark:text-slate-300 font-bold text-xs">
+                Git
               </a>
             </div>
           </div>
 
-          {/* Quick Links */}
+          {/* Explore Products */}
           <div>
-            <h3 className="text-white font-semibold text-sm uppercase tracking-wider mb-4">Quick Links</h3>
-            <ul className="space-y-3">
+            <h3 className="text-gray-800 dark:text-white font-bold text-xs uppercase tracking-wider mb-4">Explore Products</h3>
+            <ul className="space-y-3 text-xs font-semibold">
               <li>
-                <Link href="/" className="hover:text-white text-sm transition-colors">Home</Link>
+                <Link href="/explore?category=Electronics" className="hover:text-amber-500 dark:hover:text-gold transition-colors">Electronics</Link>
               </li>
               <li>
-                <Link href="/explore" className="hover:text-white text-sm transition-colors">Explore Shop</Link>
+                <Link href="/explore?category=Fashion" className="hover:text-amber-500 dark:hover:text-gold transition-colors">Fashion & Apparel</Link>
               </li>
               <li>
-                <Link href="/about" className="hover:text-white text-sm transition-colors">About Us</Link>
+                <Link href="/explore?category=Home%20%26%20Living" className="hover:text-amber-500 dark:hover:text-gold transition-colors">Home & Living</Link>
               </li>
               <li>
-                <Link href="/contact" className="hover:text-white text-sm transition-colors">Contact Support</Link>
+                <Link href="/explore?category=Fitness%20%26%20Outdoor" className="hover:text-amber-500 dark:hover:text-gold transition-colors">Fitness & Outdoors</Link>
               </li>
             </ul>
           </div>
 
-          {/* Customer Service */}
+          {/* Quick Links */}
           <div>
-            <h3 className="text-white font-semibold text-sm uppercase tracking-wider mb-4">Support & Help</h3>
-            <ul className="space-y-3">
+            <h3 className="text-gray-800 dark:text-white font-bold text-xs uppercase tracking-wider mb-4">Quick Links</h3>
+            <ul className="space-y-3 text-xs font-semibold">
               <li>
-                <Link href="/about#faq" className="hover:text-white text-sm transition-colors">FAQs</Link>
+                <Link href="/about" className="hover:text-amber-500 dark:hover:text-gold transition-colors">About ZenithMart</Link>
               </li>
               <li>
-                <Link href="/about#shipping" className="hover:text-white text-sm transition-colors">Shipping Policy</Link>
+                <Link href="/contact" className="hover:text-amber-500 dark:hover:text-gold transition-colors">Contact Support</Link>
               </li>
               <li>
-                <Link href="/about#privacy" className="hover:text-white text-sm transition-colors">Privacy & Terms</Link>
+                <Link href="/items/add" className="hover:text-amber-500 dark:hover:text-gold transition-colors">List Your Product</Link>
+              </li>
+              <li>
+                <Link href="/dashboard/admin" className="hover:text-amber-500 dark:hover:text-gold transition-colors">Admin Dashboard</Link>
               </li>
             </ul>
           </div>
 
           {/* Contact Details */}
           <div>
-            <h3 className="text-white font-semibold text-sm uppercase tracking-wider mb-4">Get In Touch</h3>
-            <ul className="space-y-4">
-              <li className="flex items-center gap-3 text-sm">
-                <MapPin size={18} className="text-indigo-400 flex-shrink-0" />
-                <span>100 Innovation Way, Silicon Valley, CA</span>
+            <h3 className="text-gray-800 dark:text-white font-bold text-xs uppercase tracking-wider mb-4">Contact</h3>
+            <ul className="space-y-4 text-xs font-semibold">
+              <li className="flex items-start gap-2.5">
+                <MapPin size={16} className="text-amber-500 dark:text-gold flex-shrink-0 mt-0.5" />
+                <span className="leading-relaxed">Mujahid Nagar, Kodomtoly, Rayerbagh, Dhaka</span>
               </li>
-              <li className="flex items-center gap-3 text-sm">
-                <Phone size={18} className="text-indigo-400 flex-shrink-0" />
-                <span>+1 (800) 555-0199</span>
+              <li className="flex items-center gap-2.5">
+                <Phone size={16} className="text-amber-500 dark:text-gold flex-shrink-0" />
+                <span>+8801712736526</span>
               </li>
-              <li className="flex items-center gap-3 text-sm">
-                <Mail size={18} className="text-indigo-400 flex-shrink-0" />
-                <span>support@zenithmart.com</span>
+              <li className="flex items-center gap-2.5">
+                <Mail size={16} className="text-amber-500 dark:text-gold flex-shrink-0" />
+                <span className="break-all">mithu00781@gmail.com</span>
               </li>
             </ul>
           </div>
         </div>
 
         {/* Footer Bottom */}
-        <div className="border-t border-slate-800 pt-8 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500">
+        <div className="border-t border-slate-200 dark:border-slate-800 pt-8 flex flex-col sm:flex-row justify-between items-center text-[10px] text-slate-400 font-semibold">
           <p>© {new Date().getFullYear()} ZenithMart Inc. All rights reserved.</p>
           <div className="flex space-x-6 mt-4 sm:mt-0">
-            <Link href="/about#privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
-            <Link href="/about#privacy" className="hover:text-white transition-colors">Terms of Service</Link>
+            <Link href="/about#privacy" className="hover:text-amber-500 dark:hover:text-gold transition-colors">Privacy Policy</Link>
+            <Link href="/about#privacy" className="hover:text-amber-500 dark:hover:text-gold transition-colors">Terms of Service</Link>
+            <Link href="/about#privacy" className="hover:text-amber-500 dark:hover:text-gold transition-colors">Cookie Preferences</Link>
           </div>
         </div>
       </div>
