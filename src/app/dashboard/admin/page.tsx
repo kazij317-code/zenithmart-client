@@ -531,15 +531,13 @@ export default function AdminDashboard() {
                             <td className="p-4 font-bold">${p.price}</td>
                             <td className="p-4 text-gray-500">{p.stock || 10} units</td>
                             <td className="p-4 text-right flex items-center justify-end gap-1.5">
-                              <a
+                              <Link
                                 href={`/products/${prodId}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
                                 className="p-1.5 rounded-lg text-brand dark:text-gold hover:bg-brand/10 dark:hover:bg-gold/10 transition-colors inline-block"
                                 title="View Details"
                               >
                                 <Eye size={16} />
-                              </a>
+                              </Link>
                               <button
                                 onClick={() => handleOpenEditModal(p)}
                                 className="p-1.5 rounded-lg text-amber-500 hover:bg-amber-500/10 transition-colors"
