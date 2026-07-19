@@ -157,7 +157,7 @@ export default function Navbar() {
                 {isDropdownOpen && (
                   <>
                     <div className="fixed inset-0 z-40" onClick={() => setIsDropdownOpen(false)} />
-                    <div className="absolute right-0 top-10 mt-2 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl py-3 z-50 animate-in fade-in slide-in-from-top-2 duration-150 text-left">
+                    <div className="absolute right-0 top-10 mt-2 w-56 bg-[#ffffff] dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl py-3 z-50 animate-in fade-in slide-in-from-top-2 duration-150 text-left">
                       <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-800 mb-2">
                         <div className="text-xs font-bold text-gray-800 dark:text-gray-200">Welcome back!</div>
                         <div className="text-[10px] text-gray-500 truncate mt-0.5">{user.email}</div>
