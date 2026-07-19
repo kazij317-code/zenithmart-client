@@ -427,33 +427,46 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
 
         {/* AI Recommendations Section */}
         {recommendations.length > 0 && (
-          <div className="border-t border-card-border pt-12 mb-8">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand/10 text-brand dark:text-indigo-300 text-xs font-semibold uppercase tracking-wider mb-6">
-              <Sparkles size={14} className="text-gold" />
-              AI Recommendations
-            </div>
-            <h2 className="text-2xl font-extrabold mb-8">Customers Also Looked At</h2>
+          <div className="border-t border-slate-200 dark:border-slate-800 pt-12 mb-8">
+            <span className="text-[10px] uppercase font-bold text-amber-500 tracking-widest block mb-1">
+              RECOMMENDATIONS
+            </span>
+            <h2 className="text-2xl font-black mb-8 text-gray-900 dark:text-white">Related Luxury Properties</h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {recommendations.map((p) => {
                 const recId = p._id || p.id || "";
                 return (
-                  <div key={recId} className="glass-card rounded-2xl overflow-hidden border border-card-border flex flex-col h-full">
+                  <div key={recId} className="bg-[#ffffff] dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col h-full shadow-sm">
                     <div className="relative h-44 w-full">
-                      <img src={p.image} alt={p.title} className="w-full h-full object-cover" />
+                      <img src={p.image} alt={p.title} className="w-full h-full object-cover rounded-t-3xl" />
+                      <span className="absolute top-4 left-4 bg-slate-950/80 backdrop-blur-md text-amber-500 dark:text-gold text-[9px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
+                        {p.category}
+                      </span>
                     </div>
-                    <div className="p-4 flex flex-col flex-grow">
-                      <h3 className="font-bold text-xs truncate mb-2">{p.title}</h3>
-                      <p className="text-[10px] text-gray-400 dark:text-gray-500 mb-4 line-clamp-2 leading-relaxed">
+                    <div className="p-5 flex flex-col flex-grow">
+                      {/* Meta Location & Rating */}
+                      <div className="flex justify-between items-center text-[10px] text-gray-400 dark:text-slate-500 font-semibold mb-3">
+                        <span>📍 Silicon Valley, CA</span>
+                        <span className="bg-amber-500/10 text-amber-600 dark:text-gold font-bold px-2 py-0.5 rounded flex items-center gap-0.5">
+                          ⭐ {p.rating.toFixed(2)}
+                        </span>
+                      </div>
+
+                      <h3 className="font-extrabold text-sm text-gray-900 dark:text-[#ffffff] truncate mb-2">{p.title}</h3>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mb-6 line-clamp-2 leading-relaxed">
                         {p.shortDescription}
                       </p>
-                      <div className="mt-auto flex justify-between items-center">
-                        <div className="font-bold text-sm">${p.price}</div>
+                      
+                      <div className="mt-auto flex justify-between items-center pt-4 border-t border-slate-100 dark:border-slate-850">
+                        <div className="font-black text-amber-500 dark:text-gold text-base">
+                          ${p.price} <span className="text-[10px] font-medium text-gray-400">/ unit</span>
+                        </div>
                         <Link
                           href={`/products/${recId}`}
-                          className="px-3 py-1.5 text-[10px] font-bold rounded-lg border border-brand/20 text-brand dark:text-gold hover:bg-brand/10 transition-all"
+                          className="px-3.5 py-1.5 text-[10px] font-bold rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-gray-700 dark:text-[#ffffff] transition-all flex items-center gap-1 border border-transparent"
                         >
-                          View Info
+                          Details &rarr;
                         </Link>
                       </div>
                     </div>

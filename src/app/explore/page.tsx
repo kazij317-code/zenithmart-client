@@ -32,6 +32,7 @@ export default function Explore() {
   const [sortBy, setSortBy] = useState("rating");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalProducts, setTotalProducts] = useState(0);
 
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:5000";
 
@@ -54,6 +55,7 @@ export default function Explore() {
       if (data.success) {
         setProducts(data.products || []);
         setTotalPages(data.pagination.totalPages || 1);
+        setTotalProducts(data.pagination.total || 0);
       }
     } catch (error) {
       console.error("Error fetching explore products:", error);
@@ -192,10 +194,17 @@ export default function Explore() {
               </div>
             </div>
 
+            {/* Total Results Label */}
+            {!loading && products.length > 0 && (
+              <div className="text-xs text-indigo-500 font-semibold px-1 py-1">
+                Showing {products.length} of {totalProducts} properties found.
+              </div>
+            )}
+
             {/* Products Grid */}
             {loading ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[1, 2, 3, 4, 5, 6].map((n) => (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
                   <div key={n} className="h-96 rounded-2xl animate-shimmer" />
                 ))}
               </div>
@@ -210,23 +219,23 @@ export default function Explore() {
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                 {products.map((p) => {
                   const pId = p._id || p.id || "";
                   return (
-                    <div key={pId} className="glass-card rounded-2xl overflow-hidden border border-card-border flex flex-col h-full">
-                      <div className="relative h-52 w-full">
-                        <img src={p.image} alt={p.title} className="w-full h-full object-cover" />
+                    <div key={pId} className="bg-[#ffffff] dark:bg-slate-900 rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-800 flex flex-col h-full shadow-sm hover:shadow-md transition-shadow">
+                      <div className="relative h-48 w-full">
+                        <img src={p.image} alt={p.title} className="w-full h-full object-cover rounded-t-3xl" />
                         <button
                           onClick={() => toggleFavorite(pId)}
-                          className={`absolute top-4 right-4 p-2 rounded-xl shadow-md backdrop-blur-sm transition-all duration-300 hover:scale-105 ${
+                          className={`absolute top-4 right-4 p-2 rounded-xl shadow-sm backdrop-blur-sm transition-all duration-300 hover:scale-105 ${
                             isFavorite(pId)
                               ? "bg-[#180A18]/90 border border-transparent"
                               : "bg-white/90 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800"
                           }`}
                         >
                           <Heart
-                            size={16}
+                            size={14}
                             className={`transition-all duration-300 ${
                               isFavorite(pId)
                                 ? "fill-[#FF2D55] text-[#FF2D55]"
@@ -236,18 +245,25 @@ export default function Explore() {
                         </button>
                       </div>
                       <div className="p-5 flex flex-col flex-1">
-                        <span className="text-[10px] uppercase font-bold text-brand dark:text-gold tracking-wider mb-1">{p.category}</span>
-                        <h3 className="font-bold text-sm truncate mb-2">{p.title}</h3>
-                        <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 mb-4 leading-relaxed">{p.shortDescription}</p>
+                        <span className="text-[9px] uppercase font-bold text-[#4F46E5] dark:text-gold tracking-widest mb-1.5">{p.category}</span>
+                        <h3 className="font-extrabold text-sm text-gray-900 dark:text-[#ffffff] truncate mb-1">{p.title}</h3>
                         
-                        <div className="mt-auto flex items-center justify-between">
+                        {/* Meta Info: Location, Rating, Date */}
+                        <div className="flex justify-between items-center text-[10px] text-gray-400 dark:text-slate-500 font-semibold mb-3">
+                          <span className="truncate max-w-[100px]">📍 Silicon Valley, CA</span>
+                          <span className="flex items-center gap-0.5 text-amber-500">⭐ {p.rating.toFixed(2)}</span>
+                        </div>
+
+                        <p className="text-xs text-gray-500 dark:text-slate-400 line-clamp-2 mb-4 leading-relaxed">{p.shortDescription}</p>
+                        
+                        <div className="mt-auto flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-850">
                           <div>
-                            <span className="text-[10px] font-semibold text-gray-400 uppercase">Price</span>
-                            <div className="text-base font-bold">${p.price}</div>
+                            <span className="text-[9px] font-bold text-gray-400 uppercase tracking-wider block">Price</span>
+                            <div className="text-base font-black text-gray-900 dark:text-[#ffffff] mt-0.5">${p.price}</div>
                           </div>
                           <Link
                             href={`/products/${pId}`}
-                            className="px-4 py-2 text-xs font-bold rounded-lg border border-brand/20 text-brand dark:text-gold dark:border-gold/20 hover:bg-brand/10 dark:hover:bg-gold/10 transition-all"
+                            className="px-4 py-2 bg-[#ffffff] dark:bg-slate-900 border border-indigo-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-[#4F46E5] dark:text-gold rounded-xl text-xs font-bold transition-all"
                           >
                             View Details
                           </Link>
