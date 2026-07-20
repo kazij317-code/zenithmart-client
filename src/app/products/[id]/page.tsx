@@ -311,15 +311,15 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
                 <button
                   onClick={() => toggleFavorite(pId)}
                   className={`p-3 rounded-xl transition-all duration-300 ${isFavorite(pId)
-                      ? "bg-[#180A18] border border-transparent"
-                      : "bg-[#F0F4F8] border border-[#3A4D62] hover:bg-[#E2E8F0] dark:bg-slate-900 dark:border-slate-700 dark:hover:bg-slate-800"
+                    ? "bg-[#180A18] border border-transparent"
+                    : "bg-[#F0F4F8] border border-[#3A4D62] hover:bg-[#E2E8F0] dark:bg-slate-900 dark:border-slate-700 dark:hover:bg-slate-800"
                     }`}
                 >
                   <Heart
                     size={20}
                     className={`transition-all duration-300 ${isFavorite(pId)
-                        ? "fill-[#FF2D55] text-[#FF2D55] scale-110"
-                        : "text-[#3A4D62] dark:text-gray-400"
+                      ? "fill-[#FF2D55] text-[#FF2D55] scale-110"
+                      : "text-[#3A4D62] dark:text-gray-400"
                       }`}
                   />
                 </button>
@@ -520,5 +520,4 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
       <AIChatBot />
     </div>
   );
-}
 }

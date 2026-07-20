@@ -85,9 +85,8 @@ export default function Navbar() {
                 <Link
                   key={link.name}
                   href={link.href}
-                  className={`text-sm font-medium transition-colors hover:text-brand dark:hover:text-gold ${
-                    isActive ? "text-brand dark:text-gold font-semibold" : "text-gray-600 dark:text-gray-300"
-                  }`}
+                  className={`text-sm font-medium transition-colors hover:text-brand dark:hover:text-gold ${isActive ? "text-brand dark:text-gold font-semibold" : "text-gray-600 dark:text-gray-300"
+                    }`}
                 >
                   {link.name}
                 </Link>
@@ -179,7 +178,7 @@ export default function Navbar() {
                         <UserIcon size={16} className="text-gray-400" />
                         DEMO USER
                       </button>
- 
+
                       <button
                         onClick={async () => {
                           setIsDropdownOpen(false);
@@ -196,6 +195,21 @@ export default function Navbar() {
                         <Users size={16} className="text-gray-400" />
                         DEMO ADMIN
                       </button>
+
+                      <div className="px-3 py-1">
+                        <button
+                          onClick={async () => {
+                            setIsDropdownOpen(false);
+                            await logout();
+                            toast.success("Logged out successfully");
+                            window.location.href = "/login";
+                          }}
+                          className="w-full flex items-center gap-3 px-4 py-2 text-xs font-semibold text-gray-700 dark:text-gray-200 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 rounded-full transition-colors text-left border-none cursor-pointer"
+                        >
+                          <Users size={16} className="text-gray-500 dark:text-gray-400" />
+                          Switch User
+                        </button>
+                      </div>
 
                       <div className="border-t border-slate-100 dark:border-slate-800 mt-2 pt-2">
                         <button
@@ -276,9 +290,8 @@ export default function Navbar() {
                 key={link.name}
                 href={link.href}
                 onClick={() => setIsOpen(false)}
-                className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${
-                  isActive ? "bg-brand/10 text-brand dark:text-gold font-semibold" : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900"
-                }`}
+                className={`block px-3 py-2 rounded-md text-base font-medium transition-colors ${isActive ? "bg-brand/10 text-brand dark:text-gold font-semibold" : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-900"
+                  }`}
               >
                 {link.name}
               </Link>
