@@ -220,9 +220,8 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
                   <button
                     key={idx}
                     onClick={() => setActiveImage(img)}
-                    className={`w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 border-2 transition-all ${
-                      activeImage === img ? "border-brand dark:border-gold scale-95" : "border-transparent opacity-75 hover:opacity-100"
-                    }`}
+                    className={`w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 border-2 transition-all ${activeImage === img ? "border-brand dark:border-gold scale-95" : "border-transparent opacity-75 hover:opacity-100"
+                      }`}
                   >
                     <img src={img} alt={`Gallery ${idx}`} className="w-full h-full object-cover" />
                   </button>
@@ -311,19 +310,17 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
 
                 <button
                   onClick={() => toggleFavorite(pId)}
-                  className={`p-3 rounded-xl transition-all duration-300 ${
-                    isFavorite(pId)
+                  className={`p-3 rounded-xl transition-all duration-300 ${isFavorite(pId)
                       ? "bg-[#180A18] border border-transparent"
                       : "bg-[#F0F4F8] border border-[#3A4D62] hover:bg-[#E2E8F0] dark:bg-slate-900 dark:border-slate-700 dark:hover:bg-slate-800"
-                  }`}
+                    }`}
                 >
                   <Heart
                     size={20}
-                    className={`transition-all duration-300 ${
-                      isFavorite(pId)
+                    className={`transition-all duration-300 ${isFavorite(pId)
                         ? "fill-[#FF2D55] text-[#FF2D55] scale-110"
                         : "text-[#3A4D62] dark:text-gray-400"
-                    }`}
+                      }`}
                   />
                 </button>
               </div>
@@ -498,7 +495,7 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
                       <p className="text-xs text-gray-500 dark:text-gray-400 mb-6 line-clamp-2 leading-relaxed">
                         {p.shortDescription}
                       </p>
-                      
+
                       <div className="mt-auto flex justify-between items-center pt-4 border-t border-slate-100 dark:border-slate-850">
                         <div className="font-black text-amber-500 dark:text-gold text-base">
                           ${p.price} <span className="text-[10px] font-medium text-gray-400">/ unit</span>
@@ -523,4 +520,5 @@ export default function ProductDetails({ params }: { params: Promise<{ id: strin
       <AIChatBot />
     </div>
   );
+}
 }
