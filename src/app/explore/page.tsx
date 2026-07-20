@@ -73,11 +73,12 @@ function ExploreContent() {
 
   const categories = ["Electronics", "Fashion", "Home & Living", "Fitness & Outdoor"];
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (overrideSearch?: string) => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
-      if (search) params.append("search", search);
+      const activeSearch = overrideSearch !== undefined ? overrideSearch : search;
+      if (activeSearch) params.append("search", activeSearch);
       if (category) params.append("category", category);
       if (minPrice) params.append("minPrice", minPrice);
       if (maxPrice) params.append("maxPrice", maxPrice);
@@ -106,7 +107,8 @@ function ExploreContent() {
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setPage(1);
-    fetchProducts();
+    fetchProducts(search);
+    setSearch("");
   };
 
   const handleClearFilters = () => {
