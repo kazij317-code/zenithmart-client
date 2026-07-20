@@ -9,6 +9,7 @@ import { authClient } from "@/lib/auth-client";
 import { Plus, Users, DollarSign, Package, ShoppingCart, Ban, ShieldCheck, Trash2, Mail, Sparkles, LogOut, Edit, Eye, X, CreditCard, Shield, Grid, PlusCircle, Compass, User, Tag, List, FileText, Image } from "lucide-react";
 import Link from "next/link";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
+import toast from "react-hot-toast";
 
 interface Stats {
   productCount: number;
@@ -188,8 +189,7 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleDeleteProduct = async (pId: string) => {
-    if (!confirm("Are you sure you want to delete this product?")) return;
+  const executeDelete = async (pId: string, productTitle: string) => {
     const tokenRes = await authClient.token();
     const token = tokenRes.data?.token || "";
     try {
@@ -203,11 +203,93 @@ export default function AdminDashboard() {
         if (data.success) {
           setProducts((prev) => prev.filter((p) => p._id !== pId && p.id !== pId));
           fetchAdminData();
+
+          // Success Toast!
+          toast.custom((t) => (
+            <div
+              className={`${
+                t.visible ? "animate-in fade-in slide-in-from-top-4 duration-300" : "animate-out fade-out slide-out-to-top-4 duration-300"
+              } max-w-md w-full bg-white dark:bg-slate-900 shadow-2xl rounded-2xl pointer-events-auto flex ring-1 ring-black ring-opacity-5 border border-emerald-500/20`}
+            >
+              <div className="flex-1 w-0 p-4">
+                <div className="flex items-start">
+                  <div className="flex-shrink-0 pt-0.5">
+                    <div className="h-10 w-10 rounded-full bg-emerald-100 dark:bg-emerald-950/30 flex items-center justify-center text-emerald-500">
+                      <Sparkles size={20} className="animate-pulse" />
+                    </div>
+                  </div>
+                  <div className="ml-3 flex-1">
+                    <p className="text-sm font-bold text-gray-900 dark:text-gray-100">
+                      Product Deleted
+                    </p>
+                    <p className="mt-1 text-xs text-gray-500 dark:text-gray-400 line-clamp-2">
+                      <span className="font-semibold text-gray-700 dark:text-gray-300">"{productTitle}"</span> has been removed successfully.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div className="flex border-l border-slate-200 dark:border-slate-800">
+                <button
+                  onClick={() => toast.dismiss(t.id)}
+                  className="w-full border border-transparent rounded-none rounded-r-2xl p-4 flex items-center justify-center text-xs font-bold text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 focus:outline-none cursor-pointer"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          ), { duration: 4000 });
         }
       }
     } catch (err) {
       console.error(err);
+      toast.error("Failed to delete the product");
     }
+  };
+
+  const handleDeleteProduct = async (pId: string) => {
+    const productToDelete = products.find((p) => (p._id === pId || p.id === pId));
+    const productTitle = productToDelete ? productToDelete.title : "Product";
+
+    toast.custom((t) => (
+      <div
+        className={`${
+          t.visible ? "animate-in fade-in slide-in-from-top-4 duration-300" : "animate-out fade-out slide-out-to-top-4 duration-300"
+        } max-w-md w-full bg-white dark:bg-slate-900 shadow-2xl rounded-2xl pointer-events-auto flex flex-col ring-1 ring-black ring-opacity-5 border border-red-500/20 p-4 space-y-3`}
+      >
+        <div className="flex items-start gap-3">
+          <div className="flex-shrink-0">
+            <div className="h-10 w-10 rounded-full bg-red-100 dark:bg-red-950/30 flex items-center justify-center text-red-500">
+              <Trash2 size={20} />
+            </div>
+          </div>
+          <div className="flex-grow">
+            <p className="text-sm font-bold text-gray-900 dark:text-gray-100">
+              Delete Product
+            </p>
+            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+              Are you sure you want to delete <span className="font-semibold text-gray-700 dark:text-gray-300">"{productTitle}"</span>? This action cannot be undone.
+            </p>
+          </div>
+        </div>
+        <div className="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+          <button
+            onClick={() => toast.dismiss(t.id)}
+            className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-gray-600 dark:text-gray-300 rounded-lg text-xs font-bold transition-colors cursor-pointer"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={async () => {
+              toast.dismiss(t.id);
+              await executeDelete(pId, productTitle);
+            }}
+            className="px-3 py-1.5 bg-red-500 hover:bg-red-600 text-white rounded-lg text-xs font-bold transition-colors cursor-pointer"
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    ), { duration: 8000 });
   };
 
   const handleOpenEditModal = (p: Product) => {
