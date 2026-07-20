@@ -7,6 +7,7 @@ import AIChatBot from "@/components/AIChatBot";
 import { useApp } from "@/context/AppContext";
 import Link from "next/link";
 import { Heart, Search, Filter, SlidersHorizontal, ChevronLeft, ChevronRight } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 
 interface Product {
   _id?: string;
@@ -39,7 +40,8 @@ const getProductLocation = (pId: string) => {
   return locations[index];
 };
 
-export default function Explore() {
+function ExploreContent() {
+  const searchParams = useSearchParams();
   const { toggleFavorite, isFavorite } = useApp();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -47,6 +49,15 @@ export default function Explore() {
   // Filters & State
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("");
+
+  useEffect(() => {
+    const queryCategory = searchParams.get("category");
+    if (queryCategory) {
+      setCategory(queryCategory);
+    } else {
+      setCategory("");
+    }
+  }, [searchParams]);
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   const [sortBy, setSortBy] = useState("rating");
@@ -325,5 +336,17 @@ export default function Explore() {
       <Footer />
       <AIChatBot />
     </div>
+  );
+}
+
+export default function Explore() {
+  return (
+    <React.Suspense fallback={
+      <div className="flex flex-col min-h-screen justify-center items-center">
+        <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    }>
+      <ExploreContent />
+    </React.Suspense>
   );
 }

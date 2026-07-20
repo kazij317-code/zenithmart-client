@@ -6,7 +6,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AIChatBot from "@/components/AIChatBot";
 import { useApp } from "@/context/AppContext";
-import { Sparkles, ArrowRight, ShieldCheck, Truck, Headphones, RotateCcw, Star, Percent, Heart } from "lucide-react";
+import { Sparkles, ArrowRight, ShieldCheck, Truck, Headphones, RotateCcw, Star, Percent, Heart, HelpCircle } from "lucide-react";
 import { toast } from "react-hot-toast";
 
 interface Product {
@@ -382,6 +382,34 @@ export default function Home() {
               ))}
             </div>
           </div>
+        </section>
+
+        {/* FAQ Section */}
+        <section id="faq" className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 pt-8 border-t border-card-border">
+          <h2 className="text-2xl font-extrabold text-center mb-8 flex items-center justify-center gap-2">
+            <HelpCircle className="text-brand dark:text-gold" size={24} /> Frequently Asked Questions
+          </h2>
+
+          <div className="space-y-4">
+            {[
+              { q: "How does the AI Shopping assistant work?", a: "ZenithBot utilizes Gemini's advanced language model, combined with our product database, to provide contextual specifications, check stock availability, suggest items, and guide you through store navigation in real-time." },
+              { q: "Do you offer physical warranty on electronics?", a: "Yes, all products purchased in the Electronics section include a standard 1-Year manufacturer warranty from ZenithMart." },
+              { q: "What payments do you accept?", a: "We accept Cash on Delivery and all major credit cards. You can choose your preferred method at checkout in your User Dashboard." }
+            ].map((item, idx) => (
+              <div key={idx} className="p-5 rounded-xl bg-gray-50 dark:bg-slate-900/30 border border-card-border">
+                <h4 className="font-bold text-sm mb-2">{item.q}</h4>
+                <p className="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">{item.a}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Privacy & Terms Section */}
+        <section id="privacy" className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 border-t border-card-border space-y-4">
+          <h2 className="text-lg font-bold">Privacy Policy & Terms of Service</h2>
+          <p className="text-xs text-gray-400 leading-relaxed">
+            Your data security is our top priority. We do not sell or share your personal information. Any information gathered during the checkout process (addresses, order history) is encrypted using industry standards and utilized solely to complete your transactions and provide personalized recommendations from ZenithBot. By using ZenithMart, you agree to our standard terms of use.
+          </p>
         </section>
 
         {/* Section 7: Newsletter */}
