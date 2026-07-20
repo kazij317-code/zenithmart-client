@@ -71,91 +71,70 @@ export default function AdminDashboard() {
 
   const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:5000";
 
-  const fetchAdminData = async () => {
-    setLoading(true);
+  const fetchAdminData = async (silent: boolean = false) => {
+    if (!silent) setLoading(true);
     const tokenRes = await authClient.token();
     const token = tokenRes.data?.token || "";
     try {
-      // 1. Fetch Stats & Chart
-      const statsRes = await fetch(`${BASE_URL}/api/admin/stats`, {
-        headers: { "Authorization": `Bearer ${token}` }
-      });
-      const statsContentType = statsRes.headers.get("content-type");
-      if (statsContentType && statsContentType.includes("application/json")) {
-        const statsData = await statsRes.json();
-        if (statsData.success) {
-          setStats(statsData.stats);
-          setSalesChart(statsData.salesChart || []);
-        }
-      } else {
-        console.error("Admin stats response was not JSON:", await statsRes.text());
-      }
+      const headers = { "Authorization": `Bearer ${token}` };
+      
+      const [statsRes, prodRes, usersRes, inqRes, subRes, ordersRes] = await Promise.all([
+        fetch(`${BASE_URL}/api/admin/stats`, { headers }),
+        fetch(`${BASE_URL}/api/products?limit=100`),
+        fetch(`${BASE_URL}/api/admin/users`, { headers }),
+        fetch(`${BASE_URL}/api/admin/inquiries`, { headers }),
+        fetch(`${BASE_URL}/api/admin/subscribers`, { headers }),
+        fetch(`${BASE_URL}/api/admin/orders`, { headers })
+      ]);
 
-      // 2. Fetch Products
-      const prodRes = await fetch(`${BASE_URL}/api/products?limit=100`);
-      const prodContentType = prodRes.headers.get("content-type");
-      if (prodContentType && prodContentType.includes("application/json")) {
-        const prodData = await prodRes.json();
-        if (prodData.success) {
-          setProducts(prodData.products || []);
-        }
-      } else {
-        console.error("Admin products response was not JSON:", await prodRes.text());
-      }
+      const [statsContentType, prodContentType, usersContentType, inqContentType, subContentType, ordersContentType] = [
+        statsRes.headers.get("content-type"),
+        prodRes.headers.get("content-type"),
+        usersRes.headers.get("content-type"),
+        inqRes.headers.get("content-type"),
+        subRes.headers.get("content-type"),
+        ordersRes.headers.get("content-type")
+      ];
 
-      // 3. Fetch Users
-      const usersRes = await fetch(`${BASE_URL}/api/admin/users`, {
-        headers: { "Authorization": `Bearer ${token}` }
-      });
-      const usersContentType = usersRes.headers.get("content-type");
-      if (usersContentType && usersContentType.includes("application/json")) {
-        const usersData = await usersRes.json();
-        if (usersData.success) {
-          setUsers(usersData.users || []);
+      const parseJSON = async (res: Response, contentType: string | null) => {
+        if (contentType && contentType.includes("application/json")) {
+          return res.json();
         }
-      } else {
-        console.error("Admin users response was not JSON:", await usersRes.text());
-      }
+        return null;
+      };
 
-      // 4. Fetch Inquiries
-      const inqRes = await fetch(`${BASE_URL}/api/admin/inquiries`, {
-        headers: { "Authorization": `Bearer ${token}` }
-      });
-      const inqContentType = inqRes.headers.get("content-type");
-      if (inqContentType && inqContentType.includes("application/json")) {
-        const inqData = await inqRes.json();
-        if (inqData.success) {
-          setInquiries(inqData.inquiries || []);
-        }
-      }
+      const [statsData, prodData, usersData, inqData, subData, ordersData] = await Promise.all([
+        parseJSON(statsRes, statsContentType),
+        parseJSON(prodRes, prodContentType),
+        parseJSON(usersRes, usersContentType),
+        parseJSON(inqRes, inqContentType),
+        parseJSON(subRes, subContentType),
+        parseJSON(ordersRes, ordersContentType)
+      ]);
 
-      // 5. Fetch Subscribers
-      const subRes = await fetch(`${BASE_URL}/api/admin/subscribers`, {
-        headers: { "Authorization": `Bearer ${token}` }
-      });
-      const subContentType = subRes.headers.get("content-type");
-      if (subContentType && subContentType.includes("application/json")) {
-        const subData = await subRes.json();
-        if (subData.success) {
-          setSubscribers(subData.subscribers || []);
-        }
+      if (statsData && statsData.success) {
+        setStats(statsData.stats);
+        setSalesChart(statsData.salesChart || []);
       }
-
-      // 6. Fetch Orders (Transactions)
-      const ordersRes = await fetch(`${BASE_URL}/api/admin/orders`, {
-        headers: { "Authorization": `Bearer ${token}` }
-      });
-      const ordersContentType = ordersRes.headers.get("content-type");
-      if (ordersContentType && ordersContentType.includes("application/json")) {
-        const ordersData = await ordersRes.json();
-        if (ordersData.success) {
-          setOrders(ordersData.orders || []);
-        }
+      if (prodData && prodData.success) {
+        setProducts(prodData.products || []);
+      }
+      if (usersData && usersData.success) {
+        setUsers(usersData.users || []);
+      }
+      if (inqData && inqData.success) {
+        setInquiries(inqData.inquiries || []);
+      }
+      if (subData && subData.success) {
+        setSubscribers(subData.subscribers || []);
+      }
+      if (ordersData && ordersData.success) {
+        setOrders(ordersData.orders || []);
       }
     } catch (err) {
       console.error("Admin fetching error:", err);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 
@@ -166,6 +145,12 @@ export default function AdminDashboard() {
   }, [user, activeTab]);
 
   const handleBlockUser = async (uId: string, currentBlockedStatus: boolean) => {
+    // 1. Optimistic Update
+    setUsers((prev) =>
+      prev.map((u) => (u.id === uId ? { ...u, isBlocked: !currentBlockedStatus } : u))
+    );
+    toast.success(!currentBlockedStatus ? "User blocked successfully" : "User unblocked successfully");
+
     const tokenRes = await authClient.token();
     const token = tokenRes.data?.token || "";
     try {
@@ -181,11 +166,26 @@ export default function AdminDashboard() {
       if (usersContentType && usersContentType.includes("application/json")) {
         const data = await res.json();
         if (data.success) {
-          fetchAdminData();
+          fetchAdminData(true);
+        } else {
+          // Revert optimistic update
+          setUsers((prev) =>
+            prev.map((u) => (u.id === uId ? { ...u, isBlocked: currentBlockedStatus } : u))
+          );
+          toast.error(data.error || "Failed to update block status");
         }
+      } else {
+        setUsers((prev) =>
+          prev.map((u) => (u.id === uId ? { ...u, isBlocked: currentBlockedStatus } : u))
+        );
+        toast.error("Failed to update block status");
       }
     } catch (err) {
       console.error(err);
+      setUsers((prev) =>
+        prev.map((u) => (u.id === uId ? { ...u, isBlocked: currentBlockedStatus } : u))
+      );
+      toast.error("Failed to update block status");
     }
   };
 
@@ -372,9 +372,16 @@ export default function AdminDashboard() {
   };
 
   const handleToggleOrderStatus = async (orderId: string, currentStatus: string) => {
+    const newStatus = currentStatus === "Pending" ? "Confirmed" : "Pending";
+    
+    // 1. Optimistic Update
+    setOrders((prev) =>
+      prev.map((o) => (o._id === orderId || o.id === orderId ? { ...o, status: newStatus } : o))
+    );
+    toast.success(`Order status updated to ${newStatus}`);
+
     const tokenRes = await authClient.token();
     const token = tokenRes.data?.token || "";
-    const newStatus = currentStatus === "Pending" ? "Confirmed" : "Pending";
     try {
       const res = await fetch(`${BASE_URL}/api/admin/orders/${orderId}/status`, {
         method: "PATCH",
@@ -386,10 +393,20 @@ export default function AdminDashboard() {
       });
       const data = await res.json();
       if (data.success) {
-        fetchAdminData();
+        fetchAdminData(true);
+      } else {
+        // Revert optimistic update
+        setOrders((prev) =>
+          prev.map((o) => (o._id === orderId || o.id === orderId ? { ...o, status: currentStatus } : o))
+        );
+        toast.error(data.error || "Failed to update order status");
       }
     } catch (err) {
       console.error("Error updating order status:", err);
+      setOrders((prev) =>
+        prev.map((o) => (o._id === orderId || o.id === orderId ? { ...o, status: currentStatus } : o))
+      );
+      toast.error("Failed to update order status");
     }
   };
 
