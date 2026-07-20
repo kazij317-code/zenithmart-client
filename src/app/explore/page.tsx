@@ -57,6 +57,10 @@ function ExploreContent() {
     } else {
       setCategory("");
     }
+    setSearch("");
+    setMinPrice("");
+    setMaxPrice("");
+    setPage(1);
   }, [searchParams]);
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
